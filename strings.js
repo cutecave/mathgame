@@ -129,9 +129,9 @@ function updateAllI18n() {
     document.querySelectorAll('[data-i18n]').forEach(el => {
         el.textContent = t(el.dataset.i18n);
     });
-    // 更新語言按鈕
+    // 更新語言按鈕（顯示當前語言）
     const langBtn = document.getElementById('langBtn');
-    if (langBtn) langBtn.textContent = currentLang === 'zh' ? 'EN' : '中';
+    if (langBtn) langBtn.textContent = currentLang === 'zh' ? '中' : 'EN';
 }
 
 // 頁面載入時初始化
