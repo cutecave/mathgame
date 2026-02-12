@@ -121,11 +121,21 @@
             object-fit: contain;
             animation: mascotBounce 2s ease-in-out infinite;
             filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2));
+            transition: transform 0.3s ease;
+        }
+
+        .mascot-image.flipped {
+            animation: mascotBounceFlipped 2s ease-in-out infinite;
         }
 
         @keyframes mascotBounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
+            0%, 100% { transform: translateY(0) scaleX(1); }
+            50% { transform: translateY(-8px) scaleX(1); }
+        }
+
+        @keyframes mascotBounceFlipped {
+            0%, 100% { transform: translateY(0) scaleX(-1); }
+            50% { transform: translateY(-8px) scaleX(-1); }
         }
 
         .question-card {
@@ -432,106 +442,139 @@
 
         .stats-tabs {
             display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
+            gap: 10px;
+            margin-bottom: 16px;
         }
 
         .stats-tab {
             flex: 1;
-            padding: 10px;
-            border: none;
-            background: #D5CEC3;
-            border-radius: 14px;
+            height: 56px;
+            border: 4px solid #8B9DC3;
+            border-radius: 28px;
+            background: linear-gradient(to bottom, #B8C6DB, #A0B0C8);
             font-family: 'BpmfIansui', "SN Pro", sans-serif;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: normal;
-            color: #5D6D7E;
+            color: #5A6988;
             cursor: pointer;
+            box-shadow: inset 0 4px 0 rgba(255,255,255,0.3), 0 6px 0 #8B9DC3, 0 8px 8px rgba(0,0,0,0.15);
+            transition: transform 0.1s;
+        }
+
+        .stats-tab:active {
+            transform: translateY(4px);
+            box-shadow: inset 0 4px 0 rgba(255,255,255,0.3), 0 2px 0 #8B9DC3;
         }
 
         .stats-tab.active {
-            background: #2C3E50;
+            background: linear-gradient(to bottom, #5DADF8, #4489D7);
+            border-color: #265C96;
             color: white;
+            box-shadow: inset 0 4px 0 rgba(255,255,255,0.35), 0 6px 0 #265C96, 0 8px 8px rgba(0,0,0,0.2);
+            -webkit-text-stroke: 1px #265C96;
+            paint-order: stroke fill;
         }
 
-        .stats-scroll {
+        .stats-box {
             background: white;
-            border-radius: 20px;
-            padding: 16px;
-            max-height: 400px;
+            border: 6px solid #485675;
+            border-radius: 40px;
+            padding: 20px;
+            height: 300px;
+            box-shadow: 0 10px 0 rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .stats-scroll {
+            height: 100%;
             overflow-y: auto;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            padding-right: 10px;
+        }
+        .stats-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .stats-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .stats-scroll::-webkit-scrollbar-thumb {
+            background: #485675;
+            border-radius: 3px;
         }
 
-        .error-item {
+        .recent-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 12px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            margin-bottom: 6px;
+            padding: 12px 16px;
+            background: #F5F7FA;
+            border-radius: 16px;
+            margin-bottom: 8px;
         }
 
-        .error-item.high-error {
-            background: #ffe6e6;
-            border-left: 4px solid #E74C3C;
+        .recent-score {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1A2B58;
         }
 
-        .error-question { font-size: 24px; font-weight: normal; color: #333; }
-        .error-stats { text-align: right; font-size: 16px; color: #666; }
-        .error-rate { font-size: 20px; font-weight: normal; color: #E74C3C; }
+        .recent-time {
+            font-size: 14px;
+            color: #5A6988;
+        }
 
         .no-data {
             font-family: 'BpmfIansui', sans-serif;
             text-align: center;
-            color: #999;
-            padding: 40px;
-            font-size: 20px;
-        }
-
-        .chart-canvas {
-            width: 100%;
-            height: 200px;
-            background: #f8f9fa;
-            border-radius: 12px;
-        }
-
-        .chart-summary {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 12px;
+            color: #5A6988;
+            padding: 50px 20px;
+            font-size: 22px;
         }
 
         /* 股票風格分數紀錄（直條） */
         .stock-container {
             display: flex;
-            background: #f8f9fa;
-            border-radius: 12px;
+            background: white;
+            border: 6px solid #485675;
+            border-radius: 40px;
             overflow: hidden;
+            box-shadow: 0 10px 0 rgba(0,0,0,0.1);
         }
         .stock-yaxis {
-            width: 40px;
-            height: 200px;
+            width: 45px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 10px 5px 30px 5px;
-            border-right: 1px solid #ddd;
-            font-size: 11px;
-            color: #666;
+            padding: 20px 8px 45px 12px;
+            border-right: 2px solid #485675;
+            font-size: 13px;
+            font-weight: bold;
+            color: #485675;
             text-align: right;
         }
-        .stock-scroll {
+        .stock-scroll-wrapper {
             flex: 1;
+            padding: 10px 15px 15px 0;
+            overflow: hidden;
+        }
+        .stock-scroll {
+            height: 100%;
             overflow-x: auto;
             overflow-y: hidden;
+        }
+        .stock-scroll::-webkit-scrollbar {
+            height: 6px;
+        }
+        .stock-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .stock-scroll::-webkit-scrollbar-thumb {
+            background: #485675;
+            border-radius: 3px;
         }
         .stock-chart {
             display: flex;
             align-items: flex-end;
-            height: 200px;
-            padding: 10px 20px 30px;
+            height: 275px;
+            padding: 0 20px 30px;
             min-width: fit-content;
         }
         .stock-day {
@@ -546,58 +589,156 @@
         .stock-bar-area {
             flex: 1;
             width: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            align-items: center;
+            position: relative;
         }
         .stock-bar {
-            width: 28px;
-            background: linear-gradient(to top, #3498DB, #2ECC71);
-            border-radius: 6px;
-            position: relative;
-            min-height: 4px;
-        }
-        .stock-bar.empty {
-            background: #ddd;
-            height: 4px !important;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 32px;
+            background: linear-gradient(to top, #5A6988, #7889A8);
+            border: 3px solid #485675;
+            border-radius: 10px;
+            box-shadow: 0 3px 0 #3B455E;
         }
         .stock-avg-line {
             position: absolute;
-            width: 40px;
-            height: 3px;
-            background: #E74C3C;
-            border-radius: 2px;
             left: 50%;
             transform: translateX(-50%);
+            width: 44px;
+            height: 4px;
+            background: #E74C3C;
+            border-radius: 2px;
         }
         .stock-date {
             font-family: 'BpmfIansui', sans-serif;
-            font-size: 14px;
-            color: #666;
+            font-size: 15px;
+            font-weight: bold;
+            color: #485675;
             position: absolute;
-            bottom: -25px;
+            bottom: -28px;
             white-space: nowrap;
         }
         .stock-value {
-            font-size: 12px;
-            color: #333;
-            margin-bottom: 4px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            color: #1A2B58;
             font-weight: bold;
+            white-space: nowrap;
         }
 
-        .reset-btn {
-            font-family: 'BpmfIansui', sans-serif;
+        .stats-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             width: 100%;
-            padding: 12px;
-            border: 2px solid #E74C3C;
+            margin-bottom: 8px;
+        }
+
+        .reset-btn-small {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 12px;
             background: transparent;
-            color: #E74C3C;
-            font-size: 18px;
-            font-weight: normal;
-            border-radius: 14px;
+            font-size: 20px;
             cursor: pointer;
-            margin-top: 12px;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+
+        .reset-btn-small:hover {
+            opacity: 1;
+        }
+
+        /* 確認彈窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-box {
+            background: white;
+            border: 6px solid #485675;
+            border-radius: 40px;
+            padding: 30px 40px;
+            box-shadow: 0 10px 0 rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 300px;
+        }
+        .modal-owl {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            margin-bottom: 16px;
+        }
+        .modal-text {
+            font-family: 'BpmfIansui', sans-serif;
+            font-size: 28px;
+            color: #1A2B58;
+            margin-bottom: 24px;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        .modal-btn {
+            flex: 1;
+            height: 50px;
+            border: 4px solid;
+            border-radius: 25px;
+            font-family: 'BpmfIansui', "SN Pro", sans-serif;
+            font-size: 20px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .modal-btn:active {
+            transform: translateY(3px);
+        }
+        .modal-cancel {
+            background: linear-gradient(to bottom, #B8C6DB, #A0B0C8);
+            border-color: #8B9DC3;
+            color: #5A6988;
+            box-shadow: 0 4px 0 #8B9DC3;
+        }
+        .modal-cancel:active {
+            box-shadow: 0 1px 0 #8B9DC3;
+        }
+        .modal-confirm {
+            background: linear-gradient(to bottom, #E74C3C, #C0392B);
+            border-color: #C0392B;
+            color: white;
+            box-shadow: 0 4px 0 #922B21;
+        }
+        .modal-confirm:active {
+            box-shadow: 0 1px 0 #922B21;
+        }
+
+        /* 版權資訊 */
+        .credits {
+            position: fixed;
+            bottom: 8px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 11px;
+            color: #999;
+        }
+        .credits a {
+            color: #888;
+            text-decoration: none;
+        }
+        .credits a:hover {
+            text-decoration: underline;
         }
 
         /* === 響應式（280px 以下才縮小，Safari 算出 314px） === */
@@ -633,21 +774,21 @@
         <div class="hidden" id="playScreen" style="margin-top: 20px; width: 100%;">
             <div class="stats-bar">
                 <div class="stat-section">
-                    <img class="stat-icon" src="images/icon_timer.png" alt="Timer">
+                    <img class="stat-icon" src="images/icon_timer.webp" alt="Timer">
                     <div class="stat-text">
                         <span class="stat-label">Time:</span>
                         <span class="stat-value"><span id="timer">30</span>s</span>
                     </div>
                 </div>
                 <div class="stat-section">
-                    <img class="stat-icon" src="images/icon_trophy.png" alt="Trophy">
+                    <img class="stat-icon" src="images/icon_trophy.webp" alt="Trophy">
                     <div class="stat-text">
                         <span class="stat-label">Score:</span>
                         <span class="stat-value" id="score">0</span>
                     </div>
                 </div>
                 <div class="stat-section">
-                    <img class="stat-icon" src="images/icon_lightning.png" alt="Combo">
+                    <img class="stat-icon" src="images/icon_lightning.webp" alt="Combo">
                     <div class="stat-text">
                         <span class="stat-label">Combo:</span>
                         <span class="stat-value">×<span id="streak">0</span></span>
@@ -687,29 +828,49 @@
 
         <!-- ===== 統計頁面 ===== -->
         <div class="stats-page hidden" id="statsScreen">
-            <div class="screen-title">📊 學習統計</div>
-            <div class="stats-tabs">
-                <button class="stats-tab active" onclick="switchTab('errors')">錯題分析</button>
-                <button class="stats-tab" onclick="switchTab('scores')">分數紀錄</button>
+            <div class="stats-header">
+                <div class="screen-title">📊 學習統計</div>
+                <button class="reset-btn-small" onclick="confirmReset()">🗑️</button>
             </div>
-            <div class="stats-scroll">
-                <div id="errorList">
-                    <div class="no-data" id="noErrorData">還沒有答題紀錄</div>
+            <div class="stats-tabs">
+                <button class="stats-tab active" onclick="switchTab('recent')">最近紀錄</button>
+                <button class="stats-tab" onclick="switchTab('chart')">每日圖表</button>
+            </div>
+            <div class="stats-box" id="recentBox">
+                <div class="stats-scroll" id="recentList">
+                    <div class="no-data" id="noRecentData">還沒有遊戲紀錄</div>
                 </div>
-                <div class="hidden" id="chartContainer">
-                    <div class="stock-container">
-                        <div class="stock-yaxis" id="stockYaxis"></div>
+            </div>
+            <div class="hidden" id="chartContainer">
+                <div class="stock-container">
+                    <div class="stock-yaxis" id="stockYaxis"></div>
+                    <div class="stock-scroll-wrapper">
                         <div class="stock-scroll">
                             <div class="stock-chart" id="stockChart"></div>
                         </div>
                     </div>
-                    <div class="no-data" id="noScoreData">還沒有遊戲紀錄</div>
                 </div>
+                <div class="no-data" id="noScoreData">還沒有遊戲紀錄</div>
             </div>
-            <button class="reset-btn" onclick="confirmReset()">🗑️ 重置所有統計資料</button>
-            <button class="big-btn btn-back" onclick="hideStats()" style="margin-top:10px;">← 返回</button>
+            <button class="big-btn btn-back" onclick="hideStats()" style="margin-top: 20px;">← 返回</button>
         </div>
     </div>
+
+    <!-- 確認彈窗 -->
+    <div class="modal-overlay hidden" id="confirmModal">
+        <div class="modal-box">
+            <img class="modal-owl" id="modalOwl" src="images/owl_surprised.webp" alt="貓頭鷹">
+            <div class="modal-text" id="modalText">刪除嗎？</div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-cancel" onclick="closeModal()">取消</button>
+                <button class="modal-btn modal-confirm" id="modalConfirm">確定</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="credits">
+        字體：<a href="https://github.com/AaronKow/sn-pro" target="_blank">SN Pro</a> by Aaron Ko、<a href="https://github.com/ButTaiwan/bpmfvs" target="_blank">注音芫荽</a> by But Ko
+    </footer>
 
     <script>
         // ===== 遊戲狀態 =====
@@ -729,19 +890,19 @@
         let nextFromErrorPool = true;
 
         // ===== 吉祥物（會換圖的貓頭鷹）=====
-        const mascotWrongImage = 'images/Gemini_Generated_Image_ckhbv4ckhbv4ckhb_01_transparent.png';
+        const mascotWrongImage = 'images/owl_shy.webp';
         const preloadWrongImg = new Image();
         preloadWrongImg.src = mascotWrongImage;
 
         const mascotImages = [
-            'images/Gemini_Generated_Image_ckhbv4ckhbv4ckhb_02_transparent.png',
-            'images/Gemini_Generated_Image_ckhbv4ckhbv4ckhb_03_transparent.png',
-            'images/Gemini_Generated_Image_ckhbv4ckhbv4ckhb_04_transparent.png',
-            'images/Gemini_Generated_Image_ckhbv4ckhbv4ckhb_05_transparent.png',
-            'images/Gemini_Generated_Image_ckhbv4ckhbv4ckhb_06_transparent.png',
-            'images/Gemini_Generated_Image_ckhbv4ckhbv4ckhb_07_transparent.png',
-            'images/Gemini_Generated_Image_ckhbv4ckhbv4ckhb_08_transparent.png',
-            'images/Gemini_Generated_Image_ckhbv4ckhbv4ckhb_09_transparent.png'
+            'images/owl_kiss.webp',
+            'images/owl_silly.webp',
+            'images/owl_flying.webp',
+            'images/owl_delighted.webp',
+            'images/owl_smiling.webp',
+            'images/owl_puffcheeks.webp',
+            'images/owl_surprised.webp',
+            'images/owl_dizzy.webp'
         ];
         let currentMascotIndex = 0;
         let mascotWrongTimeout = null;
@@ -753,6 +914,18 @@
         function setAllMascots(src) {
             getAllMascots().forEach(img => img.src = src);
         }
+
+        // 貓頭鷹隨機左右翻轉
+        function randomFlipMascot() {
+            getAllMascots().forEach(img => {
+                if (Math.random() < 0.5) {
+                    img.classList.toggle('flipped');
+                }
+            });
+            // 3-6 秒後再翻
+            setTimeout(randomFlipMascot, 3000 + Math.random() * 3000);
+        }
+        setTimeout(randomFlipMascot, 2000);
 
         function initMascot() {
             // 預載所有圖片
@@ -1059,7 +1232,7 @@
         function showStats() {
             playSound('tap');
             showScreen('statsScreen');
-            switchTab('errors');
+            switchTab('recent');
         }
 
         function hideStats() {
@@ -1070,41 +1243,43 @@
         function switchTab(tab) {
             playSound('tap');
             const tabs = document.querySelectorAll('.stats-tab');
-            tabs[0].classList.toggle('active', tab === 'errors');
-            tabs[1].classList.toggle('active', tab === 'scores');
-            document.getElementById('errorList').classList.toggle('hidden', tab !== 'errors');
-            document.getElementById('chartContainer').classList.toggle('hidden', tab !== 'scores');
+            tabs[0].classList.toggle('active', tab === 'recent');
+            tabs[1].classList.toggle('active', tab === 'chart');
+            document.getElementById('recentBox').classList.toggle('hidden', tab !== 'recent');
+            document.getElementById('chartContainer').classList.toggle('hidden', tab !== 'chart');
 
-            if (tab === 'errors') renderErrorList();
+            if (tab === 'recent') renderRecentList();
             else renderScoreChart();
         }
 
-        function renderErrorList() {
-            const stats = loadStats();
-            const errorPoolSet = loadErrorPool();
-            const list = document.getElementById('errorList');
-            const noData = document.getElementById('noErrorData');
+        function renderRecentList() {
+            const rawScores = loadScores();
+            const list = document.getElementById('recentList');
+            const noData = document.getElementById('noRecentData');
 
-            const items = [];
-            let hasData = false;
-            for (const key in stats) {
-                const s = stats[key];
-                if (s.appeared > 0) {
-                    hasData = true;
-                    items.push({ key, question: key.replace('x', ' × '), appeared: s.appeared, errors: s.errors, errorRate: s.errors / s.appeared });
-                }
-            }
+            // 相容舊格式
+            const scores = rawScores.map(s =>
+                typeof s === 'number' ? { score: s, time: Date.now() } : s
+            );
 
-            list.querySelectorAll('.error-item').forEach(el => el.remove());
-            if (!hasData) { noData.style.display = 'block'; return; }
+            list.querySelectorAll('.recent-item').forEach(el => el.remove());
+            if (!scores.length) { noData.style.display = 'block'; return; }
             noData.style.display = 'none';
 
-            items.sort((a, b) => b.errorRate !== a.errorRate ? b.errorRate - a.errorRate : b.errors - a.errors);
-            items.forEach(item => {
+            // 按時間排序（最新在前），取最近30筆
+            const recent = [...scores].sort((a, b) => b.time - a.time).slice(0, 30);
+
+            recent.forEach(item => {
+                const date = new Date(item.time);
+                const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
+                const timeStr = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+
                 const div = document.createElement('div');
-                div.className = 'error-item' + (errorPoolSet.has(item.key) ? ' high-error' : '');
-                div.innerHTML = `<div class="error-question">${item.question}</div>
-                    <div class="error-stats"><div class="error-rate">${(item.errorRate * 100).toFixed(0)}%</div><div>錯 ${item.errors} / 共 ${item.appeared}</div></div>`;
+                div.className = 'recent-item';
+                div.innerHTML = `
+                    <div class="recent-score">${item.score}</div>
+                    <div class="recent-time">${dateStr} ${timeStr}</div>
+                `;
                 list.appendChild(div);
             });
         }
@@ -1148,7 +1323,20 @@
 
             // 找出全局最高分（用於計算比例）
             const allScores = scores.map(s => s.score);
-            const globalMax = Math.max(...allScores, 100);
+            const globalMax = Math.ceil(Math.max(...allScores, 100) * 1.1);
+
+            // 找出最高分是哪天
+            let crownDate = null;
+            let crownScore = 0;
+            Object.entries(byDate).forEach(([date, dayScores]) => {
+                if (dayScores.length > 0) {
+                    const high = Math.max(...dayScores);
+                    if (high > crownScore) {
+                        crownScore = high;
+                        crownDate = date;
+                    }
+                }
+            });
 
             // 渲染 Y 軸刻度
             const ticks = 5;
@@ -1178,33 +1366,90 @@
                     const low = Math.min(...dayScores);
                     const avg = Math.round(dayScores.reduce((a, b) => a + b, 0) / dayScores.length);
 
-                    // 柱子高度：從最低分到最高分的範圍
+                    // 柱子絕對位置
                     const barBottom = (low / globalMax * 100).toFixed(1);
-                    const barHeight = ((high - low) / globalMax * 100).toFixed(1);
-                    // 平均線位置（相對於柱子底部）
-                    const avgPos = high === low ? 50 : ((avg - low) / (high - low) * 100).toFixed(1);
+                    const barTop = (high / globalMax * 100).toFixed(1);
+                    const barHeight = (barTop - barBottom).toFixed(1);
+                    // 平均線絕對位置
+                    const avgPos = (avg / globalMax * 100).toFixed(1);
+
+                    const isCrown = (date === crownDate);
+                    const hasRange = high !== low;
 
                     div.innerHTML = `
                         <div class="stock-bar-area">
-                            <div class="stock-value">${high}</div>
-                            <div class="stock-bar" style="height:${Math.max(barHeight, 5)}%;margin-bottom:${barBottom}%">
-                                <div class="stock-avg-line" style="bottom:${avgPos}%"></div>
-                            </div>
+                            <div class="stock-value" style="bottom:${barTop}%">${isCrown ? '👑 ' : ''}${high}</div>
+                            ${hasRange ? `<div class="stock-bar" style="height:${barHeight}%;bottom:${barBottom}%"></div>` : ''}
+                            <div class="stock-avg-line" style="bottom:${avgPos}%"></div>
                         </div>
                         <div class="stock-date">${dateStr}</div>
                     `;
                 }
                 container.appendChild(div);
             });
+
+            // 滾動到最右邊（最新日期）
+            const scrollArea = document.querySelector('.stock-scroll');
+            if (scrollArea) {
+                scrollArea.scrollLeft = scrollArea.scrollWidth;
+
+                // 滑鼠滾輪 → 水平滾動
+                scrollArea.onwheel = (e) => {
+                    if (e.deltaY !== 0) {
+                        e.preventDefault();
+                        scrollArea.scrollLeft += e.deltaY;
+                    }
+                };
+            }
         }
 
         function confirmReset() {
             playSound('tap');
-            if (confirm('確定要重置所有統計資料嗎？')) {
-                localStorage.removeItem(STATS_KEY);
-                localStorage.removeItem(SCORES_KEY);
-                localStorage.removeItem(ERROR_POOL_KEY);
-                switchTab('errors');
+            showModal('刪除嗎？', 'images/owl_surprised.webp', () => {
+                playSound('tap');
+                showModal('真的要刪除紀錄嗎？', 'images/owl_crying_sad.webp', () => {
+                    playSound('tap');
+                    localStorage.removeItem(STATS_KEY);
+                    localStorage.removeItem(SCORES_KEY);
+                    localStorage.removeItem(ERROR_POOL_KEY);
+                    closeModal();
+                    switchTab('errors');
+                });
+            });
+        }
+
+        function showModal(text, owlImage, onConfirm) {
+            document.getElementById('modalText').textContent = text;
+            document.getElementById('modalOwl').src = owlImage;
+            document.getElementById('confirmModal').classList.remove('hidden');
+            document.getElementById('modalConfirm').onclick = onConfirm;
+        }
+
+        function closeModal() {
+            playSound('tap');
+            document.getElementById('confirmModal').classList.add('hidden');
+        }
+
+        // 開發用：塞 7 天假資料
+        function seedDemoData() {
+            const now = Date.now();
+            const day = 24 * 60 * 60 * 1000;
+            const scores = [];
+            for (let d = 6; d >= 0; d--) {
+                const baseTime = now - d * day;
+                // 每天 2-4 場，分數在 100-500 之間波動
+                const games = 2 + Math.floor(Math.random() * 3);
+                for (let g = 0; g < games; g++) {
+                    scores.push({
+                        score: 150 + Math.floor(Math.random() * 300),
+                        time: baseTime + g * 3600000
+                    });
+                }
+            }
+            saveScores(scores);
+            console.log('已塞入 7 天假資料，共', scores.length, '筆');
+            if (document.getElementById('statsScreen').style.display !== 'none') {
+                renderScoreChart();
             }
         }
     </script>
