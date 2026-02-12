@@ -100,7 +100,7 @@
 
         .mascot-container {
             position: absolute;
-            top: min(-105px, -22vw); /* 往下移，不擋狀態列 */
+            top: max(-145px, -22vw); /* max 限制大螢幕不會飛太高 */
             left: 50%;
             transform: translateX(-50%);
             z-index: 10;
