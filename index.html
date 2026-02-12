@@ -27,7 +27,7 @@
         body {
             font-family: "SN Pro", 'BpmfIansui', -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif;
             font-weight: 600;
-            background: #FAF3E0; /* 奶油色背景 */
+            background: #9ec8ff; /* 奶油色背景 */
             min-height: 100vh;
             min-height: 100dvh;
             display: flex;
@@ -973,16 +973,16 @@
             <div class="mascot-container" style="position:relative; top:0; left:0; transform:none; margin-bottom:16px;">
                 <img class="mascot-image" src="images/owl_delighted.webp" alt="貓頭鷹">
             </div>
-            <div class="screen-title">⚙️ 練習設定</div>
-            <div class="screen-subtitle">選擇要練習的乘法表</div>
+            <div class="screen-title" id="settingsTitle">⚙️ 練習設定</div>
+            <div class="screen-subtitle" id="settingsSubtitle">選擇要練習的乘法表</div>
             <div class="settings-grid" id="settingsGrid">
                 <!-- 2-9 的乘法表 toggle -->
             </div>
             <div class="settings-actions">
-                <button onclick="selectAllMults(false)">取消全選</button>
-                <button onclick="selectAllMults(true)">全選</button>
+                <button id="btnDeselectAll" onclick="selectAllMults(false)">取消全選</button>
+                <button id="btnSelectAll" onclick="selectAllMults(true)">全選</button>
             </div>
-            <button class="big-btn btn-settings" onclick="saveSettings()" style="margin-top: 12px;">✓ 儲存</button>
+            <button class="big-btn btn-settings" id="btnSettingsSave" onclick="saveSettings()" style="margin-top: 12px;">✓ 儲存</button>
         </div>
     </div>
 
@@ -1133,13 +1133,18 @@
         }
         initMascot();
 
-        // 初始化按鈕文字（使用 strings.js）
-        function initButtons() {
+        // 初始化文字（使用 strings.js）
+        function initStrings() {
             document.getElementById('btnMultiply').textContent = STRINGS.multiplyGame;
             document.getElementById('btnChallenge').textContent = STRINGS.multiplyChallenge;
             document.getElementById('btnDivide').textContent = STRINGS.divideChallenge;
+            document.getElementById('settingsTitle').textContent = STRINGS.settingsTitle;
+            document.getElementById('settingsSubtitle').textContent = STRINGS.settingsSubtitle;
+            document.getElementById('btnSettingsSave').textContent = STRINGS.settingsSave;
+            document.getElementById('btnSelectAll').textContent = STRINGS.settingsSelectAll;
+            document.getElementById('btnDeselectAll').textContent = STRINGS.settingsDeselectAll;
         }
-        initButtons();
+        initStrings();
 
         // 換到下一張正常圖
         function nextMascot() {

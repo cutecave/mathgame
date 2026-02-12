@@ -41,13 +41,13 @@ const STRINGS = {
     confirm: '確定',
 
     // 開始按鈕
-    multiplyGame: '🚀 乘法遊戲',
-    multiplyChallenge: '🚀 乘法挑戰',
-    divideChallenge: '🚀 除法挑戰',
+    multiplyGame: 'x 乘法遊戲',
+    multiplyChallenge: 'x 乘法挑戰',
+    divideChallenge: '÷ 除法挑戰',
 
     // 設定頁面
     settingsTitle: '⚙️ 練習設定',
-    settingsSubtitle: '選擇要練習的乘法表',
+    settingsSubtitle: '練習的乘法數字：',
     settingsSave: '✓ 儲存',
     settingsSelectAll: '全選',
     settingsDeselectAll: '取消全選'
