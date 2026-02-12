@@ -503,53 +503,66 @@
             margin-top: 12px;
         }
 
-        /* 股票風格分數紀錄 */
-        .stock-day {
+        /* 股票風格分數紀錄（直條） */
+        .stock-chart {
             display: flex;
-            align-items: center;
-            padding: 12px;
+            justify-content: space-around;
+            align-items: flex-end;
+            height: 200px;
+            padding: 20px 10px 40px;
             background: #f8f9fa;
             border-radius: 12px;
-            margin-bottom: 8px;
+            position: relative;
+        }
+        .stock-day {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            height: 100%;
+            position: relative;
+        }
+        .stock-bar-area {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+        }
+        .stock-bar {
+            width: 20px;
+            background: linear-gradient(to top, #3498DB, #2ECC71);
+            border-radius: 4px;
+            position: relative;
+            min-height: 4px;
+        }
+        .stock-bar.empty {
+            background: #ddd;
+            height: 4px !important;
+        }
+        .stock-avg-line {
+            position: absolute;
+            width: 30px;
+            height: 3px;
+            background: #E74C3C;
+            border-radius: 2px;
+            left: 50%;
+            transform: translateX(-50%);
         }
         .stock-date {
             font-family: 'BpmfIansui', sans-serif;
-            font-size: 16px;
+            font-size: 12px;
             color: #666;
-            width: 70px;
-        }
-        .stock-bar {
-            flex: 1;
-            height: 24px;
-            background: #e0e0e0;
-            border-radius: 12px;
-            position: relative;
-            margin: 0 12px;
-        }
-        .stock-range {
             position: absolute;
-            height: 100%;
-            background: linear-gradient(to right, #3498DB, #2ECC71);
-            border-radius: 12px;
+            bottom: -25px;
+            white-space: nowrap;
         }
-        .stock-avg {
-            position: absolute;
-            width: 4px;
-            height: 32px;
-            background: #E74C3C;
-            border-radius: 2px;
-            top: -4px;
+        .stock-value {
+            font-size: 11px;
+            color: #333;
+            margin-bottom: 4px;
         }
-        .stock-values {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            min-width: 80px;
-            font-size: 14px;
-        }
-        .stock-high { color: #2ECC71; }
-        .stock-low { color: #3498DB; }
-        .stock-close { color: #E74C3C; font-size: 18px; }
 
         .reset-btn {
             font-family: 'BpmfIansui', sans-serif;
@@ -1105,7 +1118,10 @@
             const allScores = scores.map(s => s.score);
             const globalMax = Math.max(...allScores, 100);
 
-            // 渲染每一天
+            // 建立圖表容器
+            container.className = 'stock-chart';
+
+            // 渲染每一天的直條
             Object.entries(byDate).forEach(([date, dayScores]) => {
                 const div = document.createElement('div');
                 div.className = 'stock-day';
@@ -1114,31 +1130,30 @@
 
                 if (dayScores.length === 0) {
                     div.innerHTML = `
+                        <div class="stock-bar-area">
+                            <div class="stock-bar empty"></div>
+                        </div>
                         <div class="stock-date">${dateStr}</div>
-                        <div class="stock-bar"></div>
-                        <div class="stock-values" style="color:#999;">—</div>
                     `;
                 } else {
                     const high = Math.max(...dayScores);
                     const low = Math.min(...dayScores);
                     const avg = Math.round(dayScores.reduce((a, b) => a + b, 0) / dayScores.length);
 
-                    const left = (low / globalMax * 100).toFixed(1);
-                    const width = ((high - low) / globalMax * 100).toFixed(1);
-                    const avgPos = ((avg - low) / (high - low || 1) * 100).toFixed(1);
+                    // 柱子高度：從最低分到最高分的範圍
+                    const barBottom = (low / globalMax * 100).toFixed(1);
+                    const barHeight = ((high - low) / globalMax * 100).toFixed(1);
+                    // 平均線位置（相對於柱子底部）
+                    const avgPos = high === low ? 50 : ((avg - low) / (high - low) * 100).toFixed(1);
 
                     div.innerHTML = `
-                        <div class="stock-date">${dateStr}</div>
-                        <div class="stock-bar">
-                            <div class="stock-range" style="left:${left}%;width:${Math.max(width, 2)}%">
-                                <div class="stock-avg" style="left:${avgPos}%"></div>
+                        <div class="stock-bar-area">
+                            <div class="stock-value">${high}</div>
+                            <div class="stock-bar" style="height:${Math.max(barHeight, 5)}%;margin-bottom:${barBottom}%">
+                                <div class="stock-avg-line" style="bottom:${avgPos}%"></div>
                             </div>
                         </div>
-                        <div class="stock-values">
-                            <span class="stock-high">▲${high}</span>
-                            <span class="stock-close">${avg}</span>
-                            <span class="stock-low">▼${low}</span>
-                        </div>
+                        <div class="stock-date">${dateStr}</div>
                     `;
                 }
                 container.appendChild(div);
