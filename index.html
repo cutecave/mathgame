@@ -504,23 +504,44 @@
         }
 
         /* 股票風格分數紀錄（直條） */
-        .stock-chart {
+        .stock-container {
             display: flex;
-            justify-content: space-around;
-            align-items: flex-end;
-            height: 200px;
-            padding: 20px 10px 40px;
             background: #f8f9fa;
             border-radius: 12px;
-            position: relative;
+            overflow: hidden;
+        }
+        .stock-yaxis {
+            width: 40px;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 10px 5px 30px 5px;
+            border-right: 1px solid #ddd;
+            font-size: 11px;
+            color: #666;
+            text-align: right;
+        }
+        .stock-scroll {
+            flex: 1;
+            overflow-x: auto;
+            overflow-y: hidden;
+        }
+        .stock-chart {
+            display: flex;
+            align-items: flex-end;
+            height: 200px;
+            padding: 10px 20px 30px;
+            min-width: fit-content;
         }
         .stock-day {
             display: flex;
             flex-direction: column;
             align-items: center;
-            flex: 1;
+            width: 80px;
             height: 100%;
             position: relative;
+            flex-shrink: 0;
         }
         .stock-bar-area {
             flex: 1;
@@ -531,9 +552,9 @@
             align-items: center;
         }
         .stock-bar {
-            width: 20px;
+            width: 28px;
             background: linear-gradient(to top, #3498DB, #2ECC71);
-            border-radius: 4px;
+            border-radius: 6px;
             position: relative;
             min-height: 4px;
         }
@@ -543,7 +564,7 @@
         }
         .stock-avg-line {
             position: absolute;
-            width: 30px;
+            width: 40px;
             height: 3px;
             background: #E74C3C;
             border-radius: 2px;
@@ -552,16 +573,17 @@
         }
         .stock-date {
             font-family: 'BpmfIansui', sans-serif;
-            font-size: 12px;
+            font-size: 14px;
             color: #666;
             position: absolute;
             bottom: -25px;
             white-space: nowrap;
         }
         .stock-value {
-            font-size: 11px;
+            font-size: 12px;
             color: #333;
             margin-bottom: 4px;
+            font-weight: bold;
         }
 
         .reset-btn {
@@ -675,7 +697,12 @@
                     <div class="no-data" id="noErrorData">還沒有答題紀錄</div>
                 </div>
                 <div class="hidden" id="chartContainer">
-                    <div id="stockChart"></div>
+                    <div class="stock-container">
+                        <div class="stock-yaxis" id="stockYaxis"></div>
+                        <div class="stock-scroll">
+                            <div class="stock-chart" id="stockChart"></div>
+                        </div>
+                    </div>
                     <div class="no-data" id="noScoreData">還沒有遊戲紀錄</div>
                 </div>
             </div>
@@ -1085,8 +1112,10 @@
         function renderScoreChart() {
             const rawScores = loadScores();
             const container = document.getElementById('stockChart');
+            const yaxis = document.getElementById('stockYaxis');
             const noData = document.getElementById('noScoreData');
             container.innerHTML = '';
+            yaxis.innerHTML = '';
 
             // 相容舊格式（純數字）和新格式（物件）
             const scores = rawScores.map(s =>
@@ -1095,20 +1124,23 @@
 
             if (!scores.length) {
                 noData.style.display = 'block';
+                document.querySelector('.stock-container').style.display = 'none';
                 return;
             }
             noData.style.display = 'none';
+            document.querySelector('.stock-container').style.display = 'flex';
 
-            // 按日期分組（最近 7 天）
+            // 收集所有有分數的日期
+            const dateSet = new Set();
+            scores.forEach(s => {
+                const key = new Date(s.time).toISOString().split('T')[0];
+                dateSet.add(key);
+            });
+            const sortedDates = Array.from(dateSet).sort();
+
+            // 按日期分組
             const byDate = {};
-            const now = new Date();
-            for (let i = 6; i >= 0; i--) {
-                const d = new Date(now);
-                d.setDate(d.getDate() - i);
-                const key = d.toISOString().split('T')[0];
-                byDate[key] = [];
-            }
-
+            sortedDates.forEach(d => byDate[d] = []);
             scores.forEach(s => {
                 const key = new Date(s.time).toISOString().split('T')[0];
                 if (byDate[key]) byDate[key].push(s.score);
@@ -1118,8 +1150,14 @@
             const allScores = scores.map(s => s.score);
             const globalMax = Math.max(...allScores, 100);
 
-            // 建立圖表容器
-            container.className = 'stock-chart';
+            // 渲染 Y 軸刻度
+            const ticks = 5;
+            for (let i = ticks; i >= 0; i--) {
+                const val = Math.round(globalMax * i / ticks);
+                const div = document.createElement('div');
+                div.textContent = val;
+                yaxis.appendChild(div);
+            }
 
             // 渲染每一天的直條
             Object.entries(byDate).forEach(([date, dayScores]) => {
