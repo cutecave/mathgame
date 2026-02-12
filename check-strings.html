@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>檢查注音 - strings.js</title>
+    <style>
+        @font-face {
+            font-family: 'BpmfIansui';
+            src: url('fonts/BpmfIansui-Regular.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+        body {
+            font-family: 'BpmfIansui', serif;
+            font-size: 48px;
+            line-height: 2.5;
+            padding: 40px;
+            background: #fafaf5;
+        }
+        h1 {
+            font-size: 32px;
+            color: #333;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+        .item {
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .key {
+            font-family: monospace;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        .text {
+            font-size: 48px;
+        }
+    </style>
+</head>
+<body>
+    <div id="content"></div>
+
+    <script src="strings.js"></script>
+    <script>
+        const container = document.getElementById('content');
+
+        function addSection(title) {
+            const h1 = document.createElement('h1');
+            h1.textContent = title;
+            container.appendChild(h1);
+        }
+
+        function addItem(key, text) {
+            const div = document.createElement('div');
+            div.className = 'item';
+            div.innerHTML = `<div class="key">${key}</div><div class="text"></div>`;
+            div.querySelector('.text').textContent = text; // 用 textContent 保留 IVS
+            container.appendChild(div);
+        }
+
+        // 遊戲標題
+        addSection('遊戲標題');
+        addItem('title', STRINGS.title);
+        addItem('subtitle', STRINGS.subtitle);
+
+        // 遊戲中提示
+        addSection('遊戲中提示');
+        addItem('hurryUp', STRINGS.hurryUp);
+        addItem('lastQuestion', STRINGS.lastQuestion);
+        addItem('combo', STRINGS.combo);
+
+        // 答題結果
+        addSection('答題結果');
+        addItem('correct', STRINGS.correct);
+        addItem('wrongAnswer', STRINGS.wrongAnswer);
+
+        // 結束畫面
+        addSection('結束畫面');
+        addItem('gameOver', STRINGS.gameOver);
+        addItem('playAgain', STRINGS.playAgain);
+        addItem('viewStats', STRINGS.viewStats);
+
+        // 結束評語
+        addSection('結束評語');
+        STRINGS.endMessages.forEach((msg, i) => {
+            addItem(`endMessages[${i}] (${msg.min}+)`, msg.text);
+        });
+
+        // 統計頁面
+        addSection('統計頁面');
+        addItem('statsTitle', STRINGS.statsTitle);
+        addItem('tabRecent', STRINGS.tabRecent);
+        addItem('tabChart', STRINGS.tabChart);
+        addItem('noRecord', STRINGS.noRecord);
+        addItem('back', STRINGS.back);
+
+        // 刪除確認
+        addSection('刪除確認');
+        addItem('deleteConfirm1', STRINGS.deleteConfirm1);
+        addItem('deleteConfirm2', STRINGS.deleteConfirm2);
+        addItem('cancel', STRINGS.cancel);
+        addItem('confirm', STRINGS.confirm);
+
+        // 開始按鈕
+        addSection('開始按鈕');
+        addItem('startGame', STRINGS.startGame);
+
+        // 設定頁面
+        addSection('設定頁面');
+        addItem('settingsTitle', STRINGS.settingsTitle);
+        addItem('settingsSubtitle', STRINGS.settingsSubtitle);
+        addItem('settingsSave', STRINGS.settingsSave);
+        addItem('settingsSelectAll', STRINGS.settingsSelectAll);
+        addItem('settingsDeselectAll', STRINGS.settingsDeselectAll);
+    </script>
+</body>
+</html>

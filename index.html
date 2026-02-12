@@ -877,7 +877,9 @@
             </div>
             <div class="screen-title">🎯 99 乘法大挑戰</div>
             <div class="screen-subtitle">30 秒內答對越多越好！</div>
-            <button class="big-btn btn-start" onclick="startGame()">🚀 開始遊戲</button>
+            <button class="big-btn btn-start" id="btnMultiply" onclick="startGame('multiply')">🚀 乘法遊戲</button>
+            <button class="big-btn btn-start" id="btnChallenge" onclick="startGame('challenge')">🧩 乘法挑戰</button>
+            <button class="big-btn btn-start" id="btnDivide" onclick="startGame('divide')">➗ 除法挑戰</button>
             <button class="big-btn btn-stats" onclick="showStats()">📊 查看統計</button>
         </div>
 
@@ -933,7 +935,7 @@
             <div class="screen-title">🎉 遊戲結束！</div>
             <div class="final-score" id="finalScore">0</div>
             <div class="screen-subtitle" id="endMessage">太棒了！</div>
-            <button class="big-btn btn-start" onclick="startGame()">🔄 再玩一次</button>
+            <button class="big-btn btn-start" onclick="startGame(gameMode)">🔄 再玩一󠇡次</button>
             <button class="big-btn btn-stats" onclick="showStats()">📊 查看統計</button>
         </div>
 
@@ -1009,6 +1011,7 @@
         let currentAnswer = 0;
         let currentNum1 = 0;
         let currentNum2 = 0;
+        let currentCorrectValue = 0; // 正確答案的數值
         let timerInterval = null;
         let isPlaying = false;
         let isLocked = false;
@@ -1017,6 +1020,7 @@
         const SLOW_ANSWER_THRESHOLD = 5000;
         let usedQuestions = new Set();
         let nextFromErrorPool = true;
+        let gameMode = 'multiply'; // 'multiply' | 'challenge' | 'divide'
 
         // ===== 乘法表設定 =====
         const SETTINGS_KEY = 'mathgame_mults';
@@ -1128,6 +1132,14 @@
             setAllMascots(mascotImages[0]);
         }
         initMascot();
+
+        // 初始化按鈕文字（使用 strings.js）
+        function initButtons() {
+            document.getElementById('btnMultiply').textContent = STRINGS.multiplyGame;
+            document.getElementById('btnChallenge').textContent = STRINGS.multiplyChallenge;
+            document.getElementById('btnDivide').textContent = STRINGS.divideChallenge;
+        }
+        initButtons();
 
         // 換到下一張正常圖
         function nextMascot() {
@@ -1260,8 +1272,9 @@
         }
 
         // ===== 遊戲流程 =====
-        function startGame() {
+        function startGame(mode = 'multiply') {
             playSound('tap');
+            gameMode = mode;
             timeLeft = 30;
             score = 0;
             streak = 0;
@@ -1291,14 +1304,49 @@
             const q = generateWeightedQuestion();
             currentNum1 = q.num1;
             currentNum2 = q.num2;
-            const correct = currentNum1 * currentNum2;
+            const product = currentNum1 * currentNum2;
 
-            document.getElementById('question').textContent = `${currentNum1} × ${currentNum2} = ?`;
+            let questionText = '';
+            let correct = 0;
+            let answerRange = { min: 1, max: 81 };
+
+            if (gameMode === 'multiply') {
+                // 乘法遊戲：5 × 3 = ?
+                questionText = `${currentNum1} × ${currentNum2} = ?`;
+                correct = product;
+                answerRange = { min: 1, max: 81 };
+            } else if (gameMode === 'challenge') {
+                // 乘法挑戰：? × 3 = 6 或 5 × ? = 35
+                if (Math.random() < 0.5) {
+                    // 缺第一個數：? × num2 = product
+                    questionText = `? × ${currentNum2} = ${product}`;
+                    correct = currentNum1;
+                } else {
+                    // 缺第二個數：num1 × ? = product
+                    questionText = `${currentNum1} × ? = ${product}`;
+                    correct = currentNum2;
+                }
+                answerRange = { min: 1, max: 9 };
+            } else if (gameMode === 'divide') {
+                // 除法挑戰：36 ÷ 9 = ?（product ÷ num2 = num1 或 product ÷ num1 = num2）
+                if (Math.random() < 0.5) {
+                    questionText = `${product} ÷ ${currentNum2} = ?`;
+                    correct = currentNum1;
+                } else {
+                    questionText = `${product} ÷ ${currentNum1} = ?`;
+                    correct = currentNum2;
+                }
+                answerRange = { min: 1, max: 9 };
+            }
+
+            currentCorrectValue = correct;
+            document.getElementById('question').textContent = questionText;
 
             const answers = [correct];
             while (answers.length < 3) {
-                const wrong = correct + (Math.floor(Math.random() * 20) - 10);
-                if (wrong > 0 && wrong <= 81 && !answers.includes(wrong)) answers.push(wrong);
+                const range = answerRange.max - answerRange.min;
+                const wrong = answerRange.min + Math.floor(Math.random() * range);
+                if (wrong !== correct && !answers.includes(wrong)) answers.push(wrong);
             }
 
             // 打亂
@@ -1361,8 +1409,7 @@
                 streak = 0;
                 recordAnswer(currentNum1, currentNum2, false);
 
-                const correctValue = currentNum1 * currentNum2;
-                document.getElementById('message').innerHTML = `❌ ${STRINGS.wrongAnswer} ${correctValue}`;
+                document.getElementById('message').innerHTML = `❌ ${STRINGS.wrongAnswer} ${currentCorrectValue}`;
 
                 btns.forEach(b => b.disabled = true);
                 setTimeout(() => {
