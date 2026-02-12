@@ -293,6 +293,7 @@
 
         /* === 開始 / 結束畫面 === */
         .screen {
+            position: relative;
             width: 100%;
             text-align: center;
         }
@@ -865,11 +866,11 @@
     </div>
 
     <div class="game-container" id="gameContainer">
-        <!-- 設定按鈕（右上角固定） -->
-        <button class="settings-btn" id="settingsBtn" onclick="showSettings()">⚙️</button>
 
         <!-- ===== 開始畫面 ===== -->
         <div class="screen" id="startScreen">
+            <!-- 設定按鈕（右上角） -->
+            <button class="settings-btn" onclick="showSettings()">⚙️</button>
             <div class="mascot-container" style="position:relative; top:0; left:0; transform:none; margin-bottom:16px;">
                 <img id="mascotStart" class="mascot-image" src="" alt="貓頭鷹">
             </div>
@@ -1255,8 +1256,6 @@
             ['startScreen', 'playScreen', 'endScreen', 'statsScreen', 'settingsScreen'].forEach(s => {
                 document.getElementById(s).classList.toggle('hidden', s !== id);
             });
-            // 設定按鈕只在首頁顯示
-            document.getElementById('settingsBtn').style.display = (id === 'startScreen') ? 'flex' : 'none';
         }
 
         // ===== 遊戲流程 =====
