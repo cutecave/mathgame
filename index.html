@@ -675,22 +675,24 @@
         }
 
         function initMascot() {
+            // 預載所有圖片
             mascotImages.forEach(src => { const img = new Image(); img.src = src; });
             setAllMascots(mascotImages[0]);
-            setInterval(() => {
-                if (!mascotWrongTimeout) {
-                    currentMascotIndex = (currentMascotIndex + 1) % mascotImages.length;
-                    setAllMascots(mascotImages[currentMascotIndex]);
-                }
-            }, 3000);
         }
         initMascot();
 
+        // 換到下一張正常圖
+        function nextMascot() {
+            currentMascotIndex = (currentMascotIndex + 1) % mascotImages.length;
+            setAllMascots(mascotImages[currentMascotIndex]);
+        }
+
+        // 答錯：顯示放屁圖，然後換下一張正常圖
         function showMascotWrong() {
             if (mascotWrongTimeout) clearTimeout(mascotWrongTimeout);
             setAllMascots(mascotWrongImage);
             mascotWrongTimeout = setTimeout(() => {
-                setAllMascots(mascotImages[currentMascotIndex]);
+                nextMascot(); // 放屁後換下一張
                 mascotWrongTimeout = null;
             }, 1000);
         }
@@ -887,6 +889,7 @@
                 updateDisplay();
 
                 playSound(streak > 1 ? 'combo' : 'good');
+                nextMascot(); // 答對換下一張
                 createStars(clicked);
                 if (streak > 1) showCombo(streak);
 
