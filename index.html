@@ -884,12 +884,12 @@
             <div class="mascot-container" style="position:relative; top:0; left:0; transform:none; margin-bottom:16px;">
                 <img id="mascotStart" class="mascot-image" src="" alt="貓頭鷹">
             </div>
-            <div class="screen-title">🎯 99 乘法大挑戰</div>
-            <div class="screen-subtitle">30 秒內答對越多越好！</div>
-            <button class="big-btn btn-start" id="btnMultiply" onclick="startGame('multiply')">🚀 乘法遊戲</button>
-            <button class="big-btn btn-start" id="btnChallenge" onclick="startGame('challenge')">🧩 乘法挑戰</button>
-            <button class="big-btn btn-start" id="btnDivide" onclick="startGame('divide')">➗ 除法挑戰</button>
-            <button class="big-btn btn-stats" onclick="showStats()">📊 查看統計</button>
+            <div class="screen-title" id="homeTitle">🎯 99 乘法大挑戰</div>
+            <div class="screen-subtitle" id="homeSubtitle">30 秒內答對越多越好！</div>
+            <button class="big-btn btn-start" id="btnMultiply" onclick="startGame('multiply')">✕ 乘法遊戲</button>
+            <button class="big-btn btn-start" id="btnChallenge" onclick="startGame('challenge')">✕ 乘法挑戰</button>
+            <button class="big-btn btn-start" id="btnDivide" onclick="startGame('divide')">÷ 除法挑戰</button>
+            <button class="big-btn btn-stats" id="btnViewStats" onclick="showStats()">📊 查看統計</button>
         </div>
 
         <!-- ===== 遊戲中畫面 ===== -->
@@ -941,22 +941,22 @@
             <div class="mascot-container" style="position:relative; top:0; left:0; transform:none; margin-bottom:16px;">
                 <img id="mascotEnd" class="mascot-image" src="" alt="貓頭鷹">
             </div>
-            <div class="screen-title">🎉 遊戲結束！</div>
+            <div class="screen-title" id="endTitle">🎉 遊戲結束！</div>
             <div class="final-score" id="finalScore">0</div>
             <div class="screen-subtitle" id="endMessage">太棒了！</div>
-            <button class="big-btn btn-start" onclick="startGame(gameMode)">🔄 再玩一󠇡次</button>
-            <button class="big-btn btn-stats" onclick="showStats()">📊 查看統計</button>
+            <button class="big-btn btn-start" id="btnPlayAgain" onclick="startGame(gameMode)">🔄 再玩一次</button>
+            <button class="big-btn btn-stats" id="btnViewStats2" onclick="showStats()">📊 查看統計</button>
         </div>
 
         <!-- ===== 統計頁面 ===== -->
         <div class="stats-page hidden" id="statsScreen">
             <div class="stats-header">
-                <div class="screen-title">📊 學習統計</div>
+                <div class="screen-title" id="statsTitle">📊 學習統計</div>
                 <button class="reset-btn-small" onclick="confirmReset()">🗑️</button>
             </div>
             <div class="stats-tabs">
-                <button class="stats-tab active" onclick="switchTab('recent')">最近紀錄</button>
-                <button class="stats-tab" onclick="switchTab('chart')">每日圖表</button>
+                <button class="stats-tab active" id="tabRecent" onclick="switchTab('recent')">最近紀錄</button>
+                <button class="stats-tab" id="tabChart" onclick="switchTab('chart')">每日圖表</button>
             </div>
             <div class="stats-box" id="recentBox">
                 <div class="stats-scroll" id="recentList">
@@ -974,7 +974,7 @@
                 </div>
                 <div class="no-data" id="noScoreData">還沒有遊戲紀錄</div>
             </div>
-            <button class="big-btn btn-back" onclick="hideStats()" style="margin-top: 20px;">← 返回</button>
+            <button class="big-btn btn-back" id="btnBack" onclick="hideStats()" style="margin-top: 20px;">← 返回</button>
         </div>
 
         <!-- ===== 設定頁面 ===== -->
@@ -1001,7 +1001,7 @@
             <img class="modal-owl" id="modalOwl" src="images/owl_surprised.webp" alt="貓頭鷹">
             <div class="modal-text" id="modalText">刪除嗎？</div>
             <div class="modal-buttons">
-                <button class="modal-btn modal-cancel" onclick="closeModal()">取消</button>
+                <button class="modal-btn modal-cancel" id="btnCancel" onclick="closeModal()">取消</button>
                 <button class="modal-btn modal-confirm" id="modalConfirm">確定</button>
             </div>
         </div>
@@ -1144,17 +1144,39 @@
 
         // 初始化文字（使用 strings.js）
         function initStrings() {
+            // 語言按鈕
+            document.getElementById('langBtn').textContent = currentLang === 'zh' ? 'EN' : '中';
+
             // 首頁
+            document.getElementById('homeTitle').textContent = t('title');
+            document.getElementById('homeSubtitle').textContent = t('subtitle');
             document.getElementById('btnMultiply').textContent = t('multiplyGame');
             document.getElementById('btnChallenge').textContent = t('multiplyChallenge');
             document.getElementById('btnDivide').textContent = t('divideChallenge');
-            document.getElementById('langBtn').textContent = currentLang === 'zh' ? 'EN' : '中';
+            document.getElementById('btnViewStats').textContent = t('viewStats');
+
+            // 結束畫面
+            document.getElementById('endTitle').textContent = t('gameOver');
+            document.getElementById('btnPlayAgain').textContent = t('playAgain');
+            document.getElementById('btnViewStats2').textContent = t('viewStats');
+
+            // 統計頁面
+            document.getElementById('statsTitle').textContent = t('statsTitle');
+            document.getElementById('tabRecent').textContent = t('tabRecent');
+            document.getElementById('tabChart').textContent = t('tabChart');
+            document.getElementById('noRecentData').textContent = t('noRecord');
+            document.getElementById('noScoreData').textContent = t('noRecord');
+            document.getElementById('btnBack').textContent = t('back');
 
             // 設定頁面
             document.getElementById('settingsTitle').textContent = t('settingsTitle');
             document.getElementById('btnSettingsSave').textContent = t('settingsSave');
             document.getElementById('btnSelectAll').textContent = t('settingsSelectAll');
             document.getElementById('btnDeselectAll').textContent = t('settingsDeselectAll');
+
+            // 確認彈窗
+            document.getElementById('btnCancel').textContent = t('cancel');
+            document.getElementById('modalConfirm').textContent = t('confirm');
         }
         initStrings();
 
