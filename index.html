@@ -1376,9 +1376,16 @@
 
             const answers = [correct];
             while (answers.length < 3) {
-                const range = answerRange.max - answerRange.min;
-                const wrong = answerRange.min + Math.floor(Math.random() * range);
-                if (wrong !== correct && !answers.includes(wrong)) answers.push(wrong);
+                // 在正確答案附近生成錯誤答案（±1~5 的範圍）
+                let offset = Math.floor(Math.random() * 5) + 1; // 1-5
+                if (Math.random() < 0.5) offset = -offset;
+                let wrong = correct + offset;
+                // 確保在合理範圍內
+                if (wrong < answerRange.min) wrong = correct + Math.abs(offset);
+                if (wrong > answerRange.max) wrong = correct - Math.abs(offset);
+                if (wrong !== correct && wrong >= answerRange.min && wrong <= answerRange.max && !answers.includes(wrong)) {
+                    answers.push(wrong);
+                }
             }
 
             // 打亂
