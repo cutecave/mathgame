@@ -503,9 +503,53 @@
             margin-top: 12px;
         }
 
-        .chart-summary-item { text-align: center; }
-        .chart-summary-label { font-family: 'BpmfIansui', sans-serif; font-size: 16px; color: #666; }
-        .chart-summary-value { font-size: 28px; font-weight: normal; color: #3498DB; }
+        /* 股票風格分數紀錄 */
+        .stock-day {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+        .stock-date {
+            font-family: 'BpmfIansui', sans-serif;
+            font-size: 16px;
+            color: #666;
+            width: 70px;
+        }
+        .stock-bar {
+            flex: 1;
+            height: 24px;
+            background: #e0e0e0;
+            border-radius: 12px;
+            position: relative;
+            margin: 0 12px;
+        }
+        .stock-range {
+            position: absolute;
+            height: 100%;
+            background: linear-gradient(to right, #3498DB, #2ECC71);
+            border-radius: 12px;
+        }
+        .stock-avg {
+            position: absolute;
+            width: 4px;
+            height: 32px;
+            background: #E74C3C;
+            border-radius: 2px;
+            top: -4px;
+        }
+        .stock-values {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            min-width: 80px;
+            font-size: 14px;
+        }
+        .stock-high { color: #2ECC71; }
+        .stock-low { color: #3498DB; }
+        .stock-close { color: #E74C3C; font-size: 18px; }
 
         .reset-btn {
             font-family: 'BpmfIansui', sans-serif;
@@ -618,21 +662,8 @@
                     <div class="no-data" id="noErrorData">還沒有答題紀錄</div>
                 </div>
                 <div class="hidden" id="chartContainer">
-                    <canvas class="chart-canvas" id="scoreChart"></canvas>
-                    <div class="chart-summary">
-                        <div class="chart-summary-item">
-                            <div class="chart-summary-label">遊戲次數</div>
-                            <div class="chart-summary-value" id="totalGames">0</div>
-                        </div>
-                        <div class="chart-summary-item">
-                            <div class="chart-summary-label">最高分</div>
-                            <div class="chart-summary-value" id="highScore">0</div>
-                        </div>
-                        <div class="chart-summary-item">
-                            <div class="chart-summary-label">平均分</div>
-                            <div class="chart-summary-value" id="avgScore">0</div>
-                        </div>
-                    </div>
+                    <div id="stockChart"></div>
+                    <div class="no-data" id="noScoreData">還沒有遊戲紀錄</div>
                 </div>
             </div>
             <button class="reset-btn" onclick="confirmReset()">🗑️ 重置所有統計資料</button>
@@ -782,7 +813,8 @@
 
         function recordScore(finalScore) {
             const scores = loadScores();
-            scores.push(finalScore);
+            // 新格式：存時間戳
+            scores.push({ score: finalScore, time: Date.now() });
             saveScores(scores);
         }
 
@@ -1038,51 +1070,78 @@
         }
 
         function renderScoreChart() {
-            const scores = loadScores();
-            const canvas = document.getElementById('scoreChart');
-            const ctx = canvas.getContext('2d');
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * devicePixelRatio;
-            canvas.height = rect.height * devicePixelRatio;
-            ctx.scale(devicePixelRatio, devicePixelRatio);
-            const w = rect.width, h = rect.height, p = 40;
-            ctx.clearRect(0, 0, w, h);
+            const rawScores = loadScores();
+            const container = document.getElementById('stockChart');
+            const noData = document.getElementById('noScoreData');
+            container.innerHTML = '';
 
-            document.getElementById('totalGames').textContent = scores.length;
-            document.getElementById('highScore').textContent = scores.length ? Math.max(...scores) : 0;
-            document.getElementById('avgScore').textContent = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+            // 相容舊格式（純數字）和新格式（物件）
+            const scores = rawScores.map(s =>
+                typeof s === 'number' ? { score: s, time: Date.now() } : s
+            );
 
             if (!scores.length) {
-                ctx.fillStyle = '#999'; ctx.font = '16px sans-serif'; ctx.textAlign = 'center';
-                ctx.fillText('還沒有遊戲紀錄', w / 2, h / 2);
+                noData.style.display = 'block';
                 return;
             }
+            noData.style.display = 'none';
 
-            const max = Math.max(...scores, 100);
-            const cw = w - p * 2, ch = h - p * 2;
-
-            ctx.strokeStyle = '#ddd'; ctx.lineWidth = 1;
-            ctx.beginPath(); ctx.moveTo(p, p); ctx.lineTo(p, h - p); ctx.lineTo(w - p, h - p); ctx.stroke();
-
-            ctx.fillStyle = '#666'; ctx.font = '12px sans-serif'; ctx.textAlign = 'right';
-            for (let i = 0; i <= 5; i++) {
-                const y = h - p - (ch * i / 5);
-                ctx.fillText(Math.round(max * i / 5), p - 5, y + 4);
-                ctx.strokeStyle = '#eee'; ctx.beginPath(); ctx.moveTo(p, y); ctx.lineTo(w - p, y); ctx.stroke();
+            // 按日期分組（最近 7 天）
+            const byDate = {};
+            const now = new Date();
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(now);
+                d.setDate(d.getDate() - i);
+                const key = d.toISOString().split('T')[0];
+                byDate[key] = [];
             }
 
-            ctx.strokeStyle = '#3498DB'; ctx.lineWidth = 2; ctx.beginPath();
-            const sp = cw / Math.max(scores.length - 1, 1);
-            scores.forEach((s, i) => {
-                const x = p + i * sp, y = h - p - (s / max * ch);
-                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            scores.forEach(s => {
+                const key = new Date(s.time).toISOString().split('T')[0];
+                if (byDate[key]) byDate[key].push(s.score);
             });
-            ctx.stroke();
 
-            ctx.fillStyle = '#3498DB';
-            scores.forEach((s, i) => {
-                const x = p + i * sp, y = h - p - (s / max * ch);
-                ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill();
+            // 找出全局最高分（用於計算比例）
+            const allScores = scores.map(s => s.score);
+            const globalMax = Math.max(...allScores, 100);
+
+            // 渲染每一天
+            Object.entries(byDate).forEach(([date, dayScores]) => {
+                const div = document.createElement('div');
+                div.className = 'stock-day';
+
+                const dateStr = date.slice(5).replace('-', '/'); // "02/12"
+
+                if (dayScores.length === 0) {
+                    div.innerHTML = `
+                        <div class="stock-date">${dateStr}</div>
+                        <div class="stock-bar"></div>
+                        <div class="stock-values" style="color:#999;">—</div>
+                    `;
+                } else {
+                    const high = Math.max(...dayScores);
+                    const low = Math.min(...dayScores);
+                    const avg = Math.round(dayScores.reduce((a, b) => a + b, 0) / dayScores.length);
+
+                    const left = (low / globalMax * 100).toFixed(1);
+                    const width = ((high - low) / globalMax * 100).toFixed(1);
+                    const avgPos = ((avg - low) / (high - low || 1) * 100).toFixed(1);
+
+                    div.innerHTML = `
+                        <div class="stock-date">${dateStr}</div>
+                        <div class="stock-bar">
+                            <div class="stock-range" style="left:${left}%;width:${Math.max(width, 2)}%">
+                                <div class="stock-avg" style="left:${avgPos}%"></div>
+                            </div>
+                        </div>
+                        <div class="stock-values">
+                            <span class="stock-high">▲${high}</span>
+                            <span class="stock-close">${avg}</span>
+                            <span class="stock-low">▼${low}</span>
+                        </div>
+                    `;
+                }
+                container.appendChild(div);
             });
         }
 
