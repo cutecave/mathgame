@@ -27,7 +27,7 @@
         body {
             font-family: "SN Pro", 'BpmfIansui', -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif;
             font-weight: 600;
-            background: #9ec8ff; /* 奶油色背景 */
+            background: rgb(164, 208, 255); /* 淺藍色背景 */
             min-height: 100vh;
             min-height: 100dvh;
             display: flex;
@@ -368,17 +368,15 @@
 
         .hidden { display: none !important; }
 
-        /* === 設定按鈕（首頁右上角） === */
-        .settings-btn {
+        /* === 右上角按鈕 === */
+        .settings-btn, .lang-btn {
             position: absolute;
             top: 16px;
-            right: 16px;
             width: 48px;
             height: 48px;
             border: 4px solid #485675;
             border-radius: 50%;
             background: white;
-            font-size: 24px;
             cursor: pointer;
             box-shadow: 0 4px 0 rgba(0,0,0,0.15);
             transition: transform 0.15s;
@@ -387,7 +385,17 @@
             justify-content: center;
             z-index: 20;
         }
-        .settings-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.15); }
+        .settings-btn {
+            right: 16px;
+            font-size: 24px;
+        }
+        .lang-btn {
+            right: 72px;
+            font-size: 14px;
+            font-weight: 900;
+            color: #485675;
+        }
+        .settings-btn:active, .lang-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.15); }
 
         /* === 設定頁面 === */
         .settings-page {
@@ -870,8 +878,9 @@
 
         <!-- ===== 開始畫面 ===== -->
         <div class="screen" id="startScreen">
-            <!-- 設定按鈕（右上角） -->
+            <!-- 右上角按鈕 -->
             <button class="settings-btn" onclick="showSettings()">⚙️</button>
+            <button class="lang-btn" id="langBtn" onclick="toggleLang()">EN</button>
             <div class="mascot-container" style="position:relative; top:0; left:0; transform:none; margin-bottom:16px;">
                 <img id="mascotStart" class="mascot-image" src="" alt="貓頭鷹">
             </div>
@@ -973,8 +982,8 @@
             <div class="mascot-container" style="position:relative; top:0; left:0; transform:none; margin-bottom:16px;">
                 <img class="mascot-image" src="images/owl_delighted.webp" alt="貓頭鷹">
             </div>
-            <div class="screen-title" id="settingsTitle">⚙️ 練習設定</div>
-            <div class="screen-subtitle" id="settingsSubtitle">選擇要練習的乘法表</div>
+            <div class="screen-title" id="settingsTitle">要練習什麼數字呢？</div>
+            <!---div class="screen-subtitle" id="settingsSubtitle">選擇要練習的乘法表</div-->
             <div class="settings-grid" id="settingsGrid">
                 <!-- 2-9 的乘法表 toggle -->
             </div>
@@ -1135,16 +1144,25 @@
 
         // 初始化文字（使用 strings.js）
         function initStrings() {
-            document.getElementById('btnMultiply').textContent = STRINGS.multiplyGame;
-            document.getElementById('btnChallenge').textContent = STRINGS.multiplyChallenge;
-            document.getElementById('btnDivide').textContent = STRINGS.divideChallenge;
-            document.getElementById('settingsTitle').textContent = STRINGS.settingsTitle;
-            document.getElementById('settingsSubtitle').textContent = STRINGS.settingsSubtitle;
-            document.getElementById('btnSettingsSave').textContent = STRINGS.settingsSave;
-            document.getElementById('btnSelectAll').textContent = STRINGS.settingsSelectAll;
-            document.getElementById('btnDeselectAll').textContent = STRINGS.settingsDeselectAll;
+            // 首頁
+            document.getElementById('btnMultiply').textContent = t('multiplyGame');
+            document.getElementById('btnChallenge').textContent = t('multiplyChallenge');
+            document.getElementById('btnDivide').textContent = t('divideChallenge');
+            document.getElementById('langBtn').textContent = currentLang === 'zh' ? 'EN' : '中';
+
+            // 設定頁面
+            document.getElementById('settingsTitle').textContent = t('settingsTitle');
+            document.getElementById('btnSettingsSave').textContent = t('settingsSave');
+            document.getElementById('btnSelectAll').textContent = t('settingsSelectAll');
+            document.getElementById('btnDeselectAll').textContent = t('settingsDeselectAll');
         }
         initStrings();
+
+        // 切換語言
+        function toggleLang() {
+            playSound('tap');
+            setLang(currentLang === 'zh' ? 'en' : 'zh');
+        }
 
         // 換到下一張正常圖
         function nextMascot() {
