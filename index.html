@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>99 乘法大挑戰 v2</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=SN+Pro:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: "SN Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif;
+            font-weight: 600;
+            background: #FAF3E0; /* 奶油色背景 */
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: min(20px, 3vw);
+            overflow-x: hidden;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: min(20px, 3vw);
+        }
+
+        /* === 頂部統計列（一體式） === */
+        .stats-bar {
+            display: flex;
+            width: 100%;
+            background: #5A6988; /* Muted Slate Blue */
+            border: 6px solid #3B455E; /* Dark Border */
+            border-radius: 50px;
+            padding: 8px min(24px, 3vw); /* 響應式 padding */
+            /* Inner shadow for "inset" look + slight drop shadow */
+            box-shadow: inset 0 4px 6px rgba(0,0,0,0.2), 0 6px 0 rgba(0,0,0,0.1);
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-section {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .stat-icon {
+            width: min(40px, 10vw);
+            height: min(40px, 10vw);
+            object-fit: contain;
+            flex-shrink: 0;
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.25));
+        }
+
+        .stat-text {
+            display: flex;
+            flex-direction: column; /* Stack Label and Value vertically */
+            align-items: flex-start;
+            justify-content: center;
+            gap: 2px;
+            line-height: 1;
+            color: white;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.85);
+            text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+            white-space: nowrap;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            text-shadow: 1px 2px 0 rgba(0,0,0,0.2);
+        }
+
+        /* === 題目卡片 === */
+        .question-card-wrapper {
+            position: relative;
+            width: 100%;
+            margin-top: min(150px, 32vw); /* 再縮小 */
+        }
+
+        .mascot-container {
+            position: absolute;
+            top: min(-105px, -22vw); /* 往下移，不擋狀態列 */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+
+        .mascot-image {
+            width: min(240px, 45vw); /* 響應式：再縮小一點 */
+            height: min(240px, 45vw);
+            object-fit: contain;
+            animation: mascotBounce 2s ease-in-out infinite;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2));
+        }
+
+        @keyframes mascotBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .question-card {
+            background: white;
+            border: 6px solid #485675; /* Slate Blue */
+            border-radius: 40px;
+            /* 上方預留空間給貓頭鷹，響應式 padding */
+            padding: min(100px, 20vw) 20px min(50px, 8vw) 20px;
+            text-align: center;
+            box-shadow: 0 10px 0 rgba(0,0,0,0.1);
+            margin-top: min(40px, 10vw);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .question-text {
+            font-size: min(64px, 16vw);
+            font-weight: 900;
+            color: #1A2B58;
+            letter-spacing: -2px;
+            white-space: nowrap;
+        }
+
+        /* Curved Speech Bubble Tail */
+        .question-card::before {
+            content: '';
+            position: absolute;
+            top: -38px;
+            left: 20%;
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-left: 6px solid #485675;
+            border-top: 6px solid #485675;
+            border-top-left-radius: 100%;
+            /* 調整角度使其像鯊魚鰭 */
+            transform: rotate(15deg) skewX(10deg);
+            z-index: 1;
+        }
+
+        /* Mask to cover the main border where the tail connects */
+        .question-card::after {
+            content: '';
+            position: absolute;
+            top: -6px; /* Match border width */
+            left: 20%;
+            width: 45px; /* Slightly wider than tail */
+            height: 10px;
+            background: white;
+            z-index: 2;
+        }
+
+
+
+        /* === 答案按鈕 === */
+        .answers-row {
+            display: flex;
+            gap: 16px;
+            width: 100%;
+        }
+
+        .answer-btn {
+            flex: 1;
+            aspect-ratio: 1 / 1;
+            border: none;
+            border-radius: 35px; /* 非常圓潤 */
+            /* 顯式指定字型以確保與題目一致 */
+            font-family: "SN Pro", sans-serif;
+            color: white;
+            font-size: min(64px, 18vw); /* 響應式字體 */
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.1s;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-width: 5px;
+            border-style: solid;
+            /* 文字描邊效果 */
+            -webkit-text-stroke: 3px; 
+            paint-order: stroke fill;
+        }
+
+        .answer-btn:nth-child(1) {
+            background: linear-gradient(to bottom, #5DADF8, #4489D7);
+            border-color: #265C96;
+            -webkit-text-stroke-color: #265C96;
+            box-shadow: inset 0 6px 0 rgba(255,255,255,0.35), 0 8px 0 #265C96, 0 12px 10px rgba(0,0,0,0.2);
+        }
+        .answer-btn:nth-child(2) {
+            background: linear-gradient(to bottom, #6EE08A, #4CAF65);
+            border-color: #2D6A3E;
+            -webkit-text-stroke-color: #2D6A3E;
+            box-shadow: inset 0 6px 0 rgba(255,255,255,0.35), 0 8px 0 #2D6A3E, 0 12px 10px rgba(0,0,0,0.2);
+        }
+        .answer-btn:nth-child(3) {
+            background: linear-gradient(to bottom, #FF8A8A, #E04F4F);
+            border-color: #9E2A2A;
+            -webkit-text-stroke-color: #9E2A2A;
+            box-shadow: inset 0 6px 0 rgba(255,255,255,0.35), 0 8px 0 #9E2A2A, 0 12px 10px rgba(0,0,0,0.2);
+        }
+
+        .answer-btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 4px 0 currentColor;
+        }
+
+        .answer-btn.correct {
+            background: #2ECC71 !important;
+            animation: btnPulse 0.4s;
+        }
+
+        .answer-btn.wrong {
+            animation: btnShake 0.4s;
+            opacity: 0.6;
+        }
+
+        .answer-btn.reveal {
+            outline: 3px dashed white;
+            outline-offset: -6px;
+        }
+
+        .answer-btn:disabled {
+            cursor: not-allowed;
+        }
+
+        @keyframes btnPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+
+        @keyframes btnShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        /* === 訊息 === */
+        .message {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2C3E50;
+            min-height: 24px;
+            text-align: center;
+        }
+
+        /* === 開始 / 結束畫面 === */
+        .screen {
+            width: 100%;
+            text-align: center;
+        }
+
+        .screen-title {
+            font-size: 28px;
+            font-weight: 900;
+            color: #2C3E50;
+            margin-bottom: 20px;
+        }
+
+        .screen-subtitle {
+            font-size: 18px;
+            color: #5D6D7E;
+            margin-bottom: 24px;
+        }
+
+        .final-score {
+            font-size: 72px;
+            font-weight: 900;
+            color: #F39C12;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 8px;
+        }
+
+        .big-btn {
+            width: 100%;
+            height: 72px; /* Taller for better touch target and 3D effect */
+            border: 5px solid;
+            border-radius: 40px;
+            color: white;
+            font-family: "SN Pro", sans-serif;
+            font-size: 28px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: transform 0.15s;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Text Stroke Effect */
+            -webkit-text-stroke: 2px;
+            paint-order: stroke fill;
+            position: relative;
+        }
+
+        .big-btn:active { transform: translateY(4px); }
+
+        .btn-start { 
+            background: linear-gradient(to bottom, #6EE08A, #4CAF65);
+            border-color: #2D6A3E;
+            -webkit-text-stroke-color: #2D6A3E;
+            box-shadow: inset 0 6px 0 rgba(255,255,255,0.35), 0 8px 0 #2D6A3E, 0 12px 10px rgba(0,0,0,0.2);
+        }
+        
+        .btn-stats, .btn-back { 
+            background: linear-gradient(to bottom, #5DADF8, #4489D7);
+            border-color: #265C96;
+            -webkit-text-stroke-color: #265C96;
+            box-shadow: inset 0 6px 0 rgba(255,255,255,0.35), 0 8px 0 #265C96, 0 12px 10px rgba(0,0,0,0.2);
+        }
+
+        .btn-stats:active, .btn-back:active, .btn-start:active {
+            box-shadow: inset 0 6px 0 rgba(255,255,255,0.35), 0 4px 0 #265C96; /* Corrected shadow offset on active */
+        }
+
+        .btn-start:active {
+             box-shadow: inset 0 6px 0 rgba(255,255,255,0.35), 0 4px 0 #2D6A3E;
+        }
+
+        .hidden { display: none !important; }
+
+        /* === 連擊 COMBO 特效 === */
+        .combo-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            font-weight: 900;
+            color: #F39C12;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.2);
+            animation: comboAnim 0.8s forwards;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        @keyframes comboAnim {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            40% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+            100% { opacity: 0; transform: translate(-50%, -80%) scale(1); }
+        }
+
+        /* === 星星噴發 === */
+        .star {
+            position: fixed;
+            pointer-events: none;
+            font-size: 24px;
+            animation: starBurst 0.7s forwards;
+            z-index: 99;
+        }
+
+        @keyframes starBurst {
+            0% { opacity: 1; transform: translate(0,0) scale(1); }
+            100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0); }
+        }
+
+        /* === 放屁特效 === */
+        .fart-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .fart-main {
+            font-size: 100px;
+            opacity: 0;
+            transform: scale(0);
+        }
+
+        .fart-main.active {
+            animation: fartPop 0.7s ease-out forwards;
+        }
+
+        @keyframes fartPop {
+            0% { opacity: 1; transform: scale(0) rotate(-10deg); }
+            30% { opacity: 1; transform: scale(1.3) rotate(5deg); }
+            100% { opacity: 0; transform: scale(1.5) translateY(-40px); }
+        }
+
+        .fart-particle {
+            position: absolute;
+            font-size: 36px;
+            opacity: 0;
+        }
+
+        .fart-particle.active {
+            animation: fartFloat 0.7s ease-out forwards;
+        }
+
+        @keyframes fartFloat {
+            0% { opacity: 0.8; transform: translate(0,0) scale(0.5); }
+            100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(1) rotate(var(--rot)); }
+        }
+
+        /* === 統計頁面 === */
+        .stats-page {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .stats-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .stats-tab {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: #D5CEC3;
+            border-radius: 14px;
+            font-family: "SN Pro", sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: #5D6D7E;
+            cursor: pointer;
+        }
+
+        .stats-tab.active {
+            background: #2C3E50;
+            color: white;
+        }
+
+        .stats-scroll {
+            background: white;
+            border-radius: 20px;
+            padding: 16px;
+            max-height: 400px;
+            overflow-y: auto;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+
+        .error-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 6px;
+        }
+
+        .error-item.high-error {
+            background: #ffe6e6;
+            border-left: 4px solid #E74C3C;
+        }
+
+        .error-question { font-size: 18px; font-weight: 700; color: #333; }
+        .error-stats { text-align: right; font-size: 12px; color: #666; }
+        .error-rate { font-size: 16px; font-weight: 700; color: #E74C3C; }
+
+        .no-data {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+            font-size: 16px;
+        }
+
+        .chart-canvas {
+            width: 100%;
+            height: 200px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .chart-summary {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 12px;
+        }
+
+        .chart-summary-item { text-align: center; }
+        .chart-summary-label { font-size: 12px; color: #666; }
+        .chart-summary-value { font-size: 20px; font-weight: 800; color: #3498DB; }
+
+        .reset-btn {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #E74C3C;
+            background: transparent;
+            color: #E74C3C;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 14px;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+
+        /* === 響應式（280px 以下才縮小，Safari 算出 314px） === */
+        @media (max-width: 280px) {
+            .question-text { font-size: 40px; }
+            .answer-btn { aspect-ratio: 1 / 0.85; font-size: 28px; }
+            .mascot-image { width: 80px; height: 80px; }
+            .mascot-container { top: -48px; }
+            .question-card { margin-top: 40px; padding: 48px 20px 24px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 放屁特效 -->
+    <div class="fart-overlay" id="fartOverlay">
+        <div class="fart-main" id="fartMain">💨</div>
+    </div>
+
+    <div class="game-container" id="gameContainer">
+
+        <!-- ===== 開始畫面 ===== -->
+        <div class="screen" id="startScreen">
+            <div class="mascot-container" style="position:relative; top:0; left:0; transform:none; margin-bottom:16px;">
+                <img id="mascotStart" class="mascot-image" src="" alt="貓頭鷹">
+            </div>
+            <div class="screen-title">🎯 99 乘法大挑戰</div>
+            <div class="screen-subtitle">30 秒內答對越多越好！</div>
+            <button class="big-btn btn-start" onclick="startGame()">🚀 開始遊戲</button>
+            <button class="big-btn btn-stats" onclick="showStats()">📊 查看統計</button>
+        </div>
+
+        <!-- ===== 遊戲中畫面 ===== -->
+        <div class="hidden" id="playScreen" style="margin-top: 20px; width: 100%;">
+            <div class="stats-bar">
+                <div class="stat-section">
+                    <img class="stat-icon" src="images/icon_timer.png" alt="Timer">
+                    <div class="stat-text">
+                        <span class="stat-label">Time:</span>
+                        <span class="stat-value"><span id="timer">30</span>s</span>
+                    </div>
+                </div>
+                <div class="stat-section">
+                    <img class="stat-icon" src="images/icon_trophy.png" alt="Trophy">
+                    <div class="stat-text">
+                        <span class="stat-label">Score:</span>
+                        <span class="stat-value" id="score">0</span>
+                    </div>
+                </div>
+                <div class="stat-section">
+                    <img class="stat-icon" src="images/icon_lightning.png" alt="Combo">
+                    <div class="stat-text">
+                        <span class="stat-label">Combo:</span>
+                        <span class="stat-value">×<span id="streak">0</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-card-wrapper">
+                <div class="mascot-container">
+                    <img id="mascotPlay" class="mascot-image" src="" alt="貓頭鷹">
+                </div>
+                <div class="question-card">
+                    <div class="question-text" id="question">9 × 7 = ?</div>
+                </div>
+            </div>
+
+            <div class="message" id="message"></div>
+
+            <div class="answers-row" id="answers">
+                <button class="answer-btn" onclick="checkAnswer(0)">63</button>
+                <button class="answer-btn" onclick="checkAnswer(1)">54</button>
+                <button class="answer-btn" onclick="checkAnswer(2)">72</button>
+            </div>
+        </div>
+
+        <!-- ===== 結束畫面 ===== -->
+        <div class="screen hidden" id="endScreen">
+            <div class="mascot-container" style="position:relative; top:0; left:0; transform:none; margin-bottom:16px;">
+                <img id="mascotEnd" class="mascot-image" src="" alt="貓頭鷹">
+            </div>
+            <div class="screen-title">🎉 遊戲結束！</div>
+            <div class="final-score" id="finalScore">0</div>
+            <div class="screen-subtitle" id="endMessage">太棒了！</div>
+            <button class="big-btn btn-start" onclick="startGame()">🔄 再玩一次</button>
+            <button class="big-btn btn-stats" onclick="showStats()">📊 查看統計</button>
+        </div>
+
+        <!-- ===== 統計頁面 ===== -->
+        <div class="stats-page hidden" id="statsScreen">
+            <div class="screen-title">📊 學習統計</div>
+            <div class="stats-tabs">
+                <button class="stats-tab active" onclick="switchTab('errors')">錯題分析</button>
+                <button class="stats-tab" onclick="switchTab('scores')">分數紀錄</button>
+            </div>
+            <div class="stats-scroll">
+                <div id="errorList">
+                    <div class="no-data" id="noErrorData">還沒有答題紀錄</div>
+                </div>
+                <div class="hidden" id="chartContainer">
+                    <canvas class="chart-canvas" id="scoreChart"></canvas>
+                    <div class="chart-summary">
+                        <div class="chart-summary-item">
+                            <div class="chart-summary-label">遊戲次數</div>
+                            <div class="chart-summary-value" id="totalGames">0</div>
+                        </div>
+                        <div class="chart-summary-item">
+                            <div class="chart-summary-label">最高分</div>
+                            <div class="chart-summary-value" id="highScore">0</div>
+                        </div>
+                        <div class="chart-summary-item">
+                            <div class="chart-summary-label">平均分</div>
+                            <div class="chart-summary-value" id="avgScore">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="reset-btn" onclick="confirmReset()">🗑️ 重置所有統計資料</button>
+            <button class="big-btn btn-back" onclick="hideStats()" style="margin-top:10px;">← 返回</button>
+        </div>
+    </div>
+
+    <script>
+        // ===== 遊戲狀態 =====
+        let timeLeft = 30;
+        let score = 0;
+        let streak = 0;
+        let currentAnswer = 0;
+        let currentNum1 = 0;
+        let currentNum2 = 0;
+        let timerInterval = null;
+        let isPlaying = false;
+        let isLocked = false;
+        let timeExpired = false;
+        let questionStartTime = 0;
+        const SLOW_ANSWER_THRESHOLD = 5000;
+        let usedQuestions = new Set();
+        let nextFromErrorPool = true;
+
+        // ===== 吉祥物（會換圖的貓頭鷹）=====
+        const mascotWrongImage = 'images/Gemini_Generated_Image_ckhbv4ckhbv4ckhb_01_transparent.png';
+        const preloadWrongImg = new Image();
+        preloadWrongImg.src = mascotWrongImage;
+
+        const mascotImages = [
+            'images/Gemini_Generated_Image_ckhbv4ckhbv4ckhb_02_transparent.png',
+            'images/Gemini_Generated_Image_ckhbv4ckhbv4ckhb_03_transparent.png',
+            'images/Gemini_Generated_Image_ckhbv4ckhbv4ckhb_04_transparent.png',
+            'images/Gemini_Generated_Image_ckhbv4ckhbv4ckhb_05_transparent.png',
+            'images/Gemini_Generated_Image_ckhbv4ckhbv4ckhb_06_transparent.png',
+            'images/Gemini_Generated_Image_ckhbv4ckhbv4ckhb_07_transparent.png',
+            'images/Gemini_Generated_Image_ckhbv4ckhbv4ckhb_08_transparent.png',
+            'images/Gemini_Generated_Image_ckhbv4ckhbv4ckhb_09_transparent.png'
+        ];
+        let currentMascotIndex = 0;
+        let mascotWrongTimeout = null;
+
+        function getAllMascots() {
+            return document.querySelectorAll('.mascot-image');
+        }
+
+        function setAllMascots(src) {
+            getAllMascots().forEach(img => img.src = src);
+        }
+
+        function initMascot() {
+            mascotImages.forEach(src => { const img = new Image(); img.src = src; });
+            setAllMascots(mascotImages[0]);
+            setInterval(() => {
+                if (!mascotWrongTimeout) {
+                    currentMascotIndex = (currentMascotIndex + 1) % mascotImages.length;
+                    setAllMascots(mascotImages[currentMascotIndex]);
+                }
+            }, 3000);
+        }
+        initMascot();
+
+        function showMascotWrong() {
+            if (mascotWrongTimeout) clearTimeout(mascotWrongTimeout);
+            setAllMascots(mascotWrongImage);
+            mascotWrongTimeout = setTimeout(() => {
+                setAllMascots(mascotImages[currentMascotIndex]);
+                mascotWrongTimeout = null;
+            }, 1000);
+        }
+
+        // ===== 音效 =====
+        const sounds = {
+            tap: [new Audio('sounds/tap-1.mp3'), new Audio('sounds/tap-2.mp3')],
+            good: new Audio('sounds/good-1.mp3'),
+            combo: new Audio('sounds/good-2.mp3'),
+            bad: [new Audio('sounds/bad-1.mp3'), new Audio('sounds/bad-2.mp3')]
+        };
+
+        function playSound(type) {
+            const sound = sounds[type];
+            if (Array.isArray(sound)) {
+                const s = sound[Math.floor(Math.random() * sound.length)];
+                s.currentTime = 0;
+                s.play().catch(() => {});
+            } else if (sound) {
+                sound.currentTime = 0;
+                sound.play().catch(() => {});
+            }
+        }
+
+        // ===== 放屁特效 =====
+        function showFart() {
+            const overlay = document.getElementById('fartOverlay');
+            const main = document.getElementById('fartMain');
+            overlay.querySelectorAll('.fart-particle').forEach(p => p.remove());
+            main.classList.remove('active');
+            void main.offsetWidth;
+            main.classList.add('active');
+
+            const particles = ['💨', '💩', '☁️', '🌫️'];
+            for (let i = 0; i < 5; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'fart-particle';
+                particle.textContent = particles[Math.floor(Math.random() * particles.length)];
+                particle.style.setProperty('--tx', `${(Math.random() - 0.5) * 200}px`);
+                particle.style.setProperty('--ty', `${-50 - Math.random() * 100}px`);
+                particle.style.setProperty('--rot', `${(Math.random() - 0.5) * 60}deg`);
+                particle.style.animationDelay = `${Math.random() * 0.2}s`;
+                overlay.appendChild(particle);
+                requestAnimationFrame(() => particle.classList.add('active'));
+                setTimeout(() => particle.remove(), 1000);
+            }
+        }
+
+        // ===== LocalStorage =====
+        const STATS_KEY = 'multiplyGameStats';
+        const SCORES_KEY = 'multiplyGameScores';
+        const ERROR_POOL_KEY = 'multiplyGameErrorPool';
+
+        function loadStats() {
+            const saved = localStorage.getItem(STATS_KEY);
+            if (saved) return JSON.parse(saved);
+            const stats = {};
+            for (let i = 2; i <= 9; i++)
+                for (let j = 1; j <= 9; j++)
+                    stats[`${i}x${j}`] = { appeared: 0, errors: 0 };
+            return stats;
+        }
+        function saveStats(stats) { localStorage.setItem(STATS_KEY, JSON.stringify(stats)); }
+        function loadScores() { const s = localStorage.getItem(SCORES_KEY); return s ? JSON.parse(s) : []; }
+        function saveScores(scores) { localStorage.setItem(SCORES_KEY, JSON.stringify(scores)); }
+        function loadErrorPool() { const s = localStorage.getItem(ERROR_POOL_KEY); return s ? new Set(JSON.parse(s)) : new Set(); }
+        function saveErrorPool(pool) { localStorage.setItem(ERROR_POOL_KEY, JSON.stringify([...pool])); }
+
+        function recordAnswer(num1, num2, isCorrect) {
+            const stats = loadStats();
+            const key = `${num1}x${num2}`;
+            if (stats[key]) { stats[key].appeared++; if (!isCorrect) stats[key].errors++; }
+            saveStats(stats);
+            const pool = loadErrorPool();
+            isCorrect ? pool.delete(key) : pool.add(key);
+            saveErrorPool(pool);
+        }
+
+        function recordScore(finalScore) {
+            const scores = loadScores();
+            scores.push(finalScore);
+            saveScores(scores);
+        }
+
+        // ===== 智慧出題 =====
+        function generateWeightedQuestion() {
+            const errorPoolSet = loadErrorPool();
+            const errorPool = [], normalPool = [];
+            if (usedQuestions.size >= 72) usedQuestions.clear();
+
+            for (let i = 2; i <= 9; i++) {
+                for (let j = 1; j <= 9; j++) {
+                    const key = `${i}x${j}`;
+                    if (usedQuestions.has(key)) continue;
+                    (errorPoolSet.has(key) ? errorPool : normalPool).push({ num1: i, num2: j });
+                }
+            }
+
+            let pool;
+            if (nextFromErrorPool && errorPool.length > 0) pool = errorPool;
+            else if (!nextFromErrorPool && normalPool.length > 0) pool = normalPool;
+            else pool = errorPool.length > 0 ? errorPool : normalPool;
+            nextFromErrorPool = !nextFromErrorPool;
+
+            const selected = pool[Math.floor(Math.random() * pool.length)];
+            usedQuestions.add(`${selected.num1}x${selected.num2}`);
+            return selected;
+        }
+
+        // ===== 畫面切換 =====
+        function showScreen(id) {
+            ['startScreen', 'playScreen', 'endScreen', 'statsScreen'].forEach(s => {
+                document.getElementById(s).classList.toggle('hidden', s !== id);
+            });
+        }
+
+        // ===== 遊戲流程 =====
+        function startGame() {
+            playSound('tap');
+            timeLeft = 30;
+            score = 0;
+            streak = 0;
+            isPlaying = true;
+            isLocked = false;
+            timeExpired = false;
+            usedQuestions.clear();
+            nextFromErrorPool = true;
+
+            showScreen('playScreen');
+            updateDisplay();
+            generateQuestion();
+            document.getElementById('message').textContent = '加油！快速作答！';
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateDisplay();
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    timeExpired = true;
+                    document.getElementById('message').textContent = '⏰ 最後一題！';
+                }
+            }, 1000);
+        }
+
+        function generateQuestion() {
+            const q = generateWeightedQuestion();
+            currentNum1 = q.num1;
+            currentNum2 = q.num2;
+            const correct = currentNum1 * currentNum2;
+
+            document.getElementById('question').textContent = `${currentNum1} × ${currentNum2} = ?`;
+
+            const answers = [correct];
+            while (answers.length < 3) {
+                const wrong = correct + (Math.floor(Math.random() * 20) - 10);
+                if (wrong > 0 && wrong <= 81 && !answers.includes(wrong)) answers.push(wrong);
+            }
+
+            // 打亂
+            for (let i = answers.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [answers[i], answers[j]] = [answers[j], answers[i]];
+            }
+
+            currentAnswer = answers.indexOf(correct);
+
+            const btns = document.querySelectorAll('.answer-btn');
+            btns.forEach((btn, i) => {
+                btn.textContent = answers[i];
+                btn.className = 'answer-btn';
+                btn.disabled = false;
+            });
+
+            isLocked = false;
+            questionStartTime = Date.now();
+        }
+
+        function checkAnswer(index) {
+            if (!isPlaying || isLocked) return;
+            isLocked = true;
+
+            const btns = document.querySelectorAll('.answer-btn');
+            const clicked = btns[index];
+
+            if (index === currentAnswer) {
+                clicked.classList.add('correct');
+                const answerTime = Date.now() - questionStartTime;
+                const isSlow = answerTime > SLOW_ANSWER_THRESHOLD;
+                recordAnswer(currentNum1, currentNum2, !isSlow);
+
+                streak++;
+                const points = streak > 1 ? 20 : 10;
+                score += points;
+                updateDisplay();
+
+                playSound(streak > 1 ? 'combo' : 'good');
+                createStars(clicked);
+                if (streak > 1) showCombo(streak);
+
+                document.getElementById('message').textContent =
+                    streak > 1 ? `🔥 ${streak} 連擊！+${points}` : `✅ +${points}`;
+
+                btns.forEach(b => b.disabled = true);
+                setTimeout(() => {
+                    if (timeExpired) endGame();
+                    else if (isPlaying) { generateQuestion(); document.getElementById('message').textContent = ''; }
+                }, 400);
+            } else {
+                clicked.classList.add('wrong');
+                btns[currentAnswer].classList.add('reveal');
+                playSound('bad');
+                showFart();
+                showMascotWrong();
+                streak = 0;
+                recordAnswer(currentNum1, currentNum2, false);
+
+                const correctValue = currentNum1 * currentNum2;
+                document.getElementById('message').textContent = `❌ 答案是 ${correctValue}`;
+
+                btns.forEach(b => b.disabled = true);
+                setTimeout(() => {
+                    if (timeExpired) endGame();
+                    else if (isPlaying) { generateQuestion(); document.getElementById('message').textContent = ''; }
+                }, 700);
+            }
+        }
+
+        function createStars(btn) {
+            const rect = btn.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            const emojis = ['⭐', '✨', '🌟', '💫'];
+
+            for (let i = 0; i < 6; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                const angle = (Math.PI * 2 / 6) * i;
+                const dist = 40 + Math.random() * 30;
+                star.style.left = cx + 'px';
+                star.style.top = cy + 'px';
+                star.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+                star.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+                document.body.appendChild(star);
+                setTimeout(() => star.remove(), 700);
+            }
+        }
+
+        function showCombo(n) {
+            const el = document.createElement('div');
+            el.className = 'combo-popup';
+            el.textContent = `${n} COMBO!`;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 800);
+        }
+
+        function updateDisplay() {
+            document.getElementById('timer').textContent = timeLeft;
+            document.getElementById('score').textContent = score;
+            document.getElementById('streak').textContent = streak;
+        }
+
+        function endGame() {
+            isPlaying = false;
+            clearInterval(timerInterval);
+            recordScore(score);
+
+            document.getElementById('finalScore').textContent = score;
+            let msg = '';
+            if (score >= 500) msg = '🏆 數學天才！';
+            else if (score >= 400) msg = '🌟 表現優異！';
+            else if (score >= 300) msg = '👍 做得不錯！';
+            else if (score >= 200) msg = '💪 繼續加油！';
+            else msg = '😊 熟能生巧！';
+            document.getElementById('endMessage').textContent = msg;
+
+            showScreen('endScreen');
+        }
+
+        // ===== 統計頁面 =====
+        function showStats() {
+            playSound('tap');
+            showScreen('statsScreen');
+            switchTab('errors');
+        }
+
+        function hideStats() {
+            playSound('tap');
+            showScreen('startScreen');
+        }
+
+        function switchTab(tab) {
+            playSound('tap');
+            const tabs = document.querySelectorAll('.stats-tab');
+            tabs[0].classList.toggle('active', tab === 'errors');
+            tabs[1].classList.toggle('active', tab === 'scores');
+            document.getElementById('errorList').classList.toggle('hidden', tab !== 'errors');
+            document.getElementById('chartContainer').classList.toggle('hidden', tab !== 'scores');
+
+            if (tab === 'errors') renderErrorList();
+            else renderScoreChart();
+        }
+
+        function renderErrorList() {
+            const stats = loadStats();
+            const errorPoolSet = loadErrorPool();
+            const list = document.getElementById('errorList');
+            const noData = document.getElementById('noErrorData');
+
+            const items = [];
+            let hasData = false;
+            for (const key in stats) {
+                const s = stats[key];
+                if (s.appeared > 0) {
+                    hasData = true;
+                    items.push({ key, question: key.replace('x', ' × '), appeared: s.appeared, errors: s.errors, errorRate: s.errors / s.appeared });
+                }
+            }
+
+            list.querySelectorAll('.error-item').forEach(el => el.remove());
+            if (!hasData) { noData.style.display = 'block'; return; }
+            noData.style.display = 'none';
+
+            items.sort((a, b) => b.errorRate !== a.errorRate ? b.errorRate - a.errorRate : b.errors - a.errors);
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'error-item' + (errorPoolSet.has(item.key) ? ' high-error' : '');
+                div.innerHTML = `<div class="error-question">${item.question}</div>
+                    <div class="error-stats"><div class="error-rate">${(item.errorRate * 100).toFixed(0)}%</div><div>錯 ${item.errors} / 共 ${item.appeared}</div></div>`;
+                list.appendChild(div);
+            });
+        }
+
+        function renderScoreChart() {
+            const scores = loadScores();
+            const canvas = document.getElementById('scoreChart');
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * devicePixelRatio;
+            canvas.height = rect.height * devicePixelRatio;
+            ctx.scale(devicePixelRatio, devicePixelRatio);
+            const w = rect.width, h = rect.height, p = 40;
+            ctx.clearRect(0, 0, w, h);
+
+            document.getElementById('totalGames').textContent = scores.length;
+            document.getElementById('highScore').textContent = scores.length ? Math.max(...scores) : 0;
+            document.getElementById('avgScore').textContent = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+
+            if (!scores.length) {
+                ctx.fillStyle = '#999'; ctx.font = '16px sans-serif'; ctx.textAlign = 'center';
+                ctx.fillText('還沒有遊戲紀錄', w / 2, h / 2);
+                return;
+            }
+
+            const max = Math.max(...scores, 100);
+            const cw = w - p * 2, ch = h - p * 2;
+
+            ctx.strokeStyle = '#ddd'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(p, p); ctx.lineTo(p, h - p); ctx.lineTo(w - p, h - p); ctx.stroke();
+
+            ctx.fillStyle = '#666'; ctx.font = '12px sans-serif'; ctx.textAlign = 'right';
+            for (let i = 0; i <= 5; i++) {
+                const y = h - p - (ch * i / 5);
+                ctx.fillText(Math.round(max * i / 5), p - 5, y + 4);
+                ctx.strokeStyle = '#eee'; ctx.beginPath(); ctx.moveTo(p, y); ctx.lineTo(w - p, y); ctx.stroke();
+            }
+
+            ctx.strokeStyle = '#3498DB'; ctx.lineWidth = 2; ctx.beginPath();
+            const sp = cw / Math.max(scores.length - 1, 1);
+            scores.forEach((s, i) => {
+                const x = p + i * sp, y = h - p - (s / max * ch);
+                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+
+            ctx.fillStyle = '#3498DB';
+            scores.forEach((s, i) => {
+                const x = p + i * sp, y = h - p - (s / max * ch);
+                ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill();
+            });
+        }
+
+        function confirmReset() {
+            playSound('tap');
+            if (confirm('確定要重置所有統計資料嗎？')) {
+                localStorage.removeItem(STATS_KEY);
+                localStorage.removeItem(SCORES_KEY);
+                localStorage.removeItem(ERROR_POOL_KEY);
+                switchTab('errors');
+            }
+        }
+    </script>
+</body>
+</html>
