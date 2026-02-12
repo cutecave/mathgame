@@ -41,7 +41,14 @@ const STRINGS = {
     confirm: '確定',
 
     // 開始按鈕
-    startGame: '🚀 開始遊戲'
+    startGame: '🚀 開始遊戲',
+
+    // 設定頁面
+    settingsTitle: '⚙️ 練習設定',
+    settingsSubtitle: '選擇要練習的乘法表',
+    settingsSave: '✓ 儲存',
+    settingsSelectAll: '全選',
+    settingsDeselectAll: '取消全選'
 };
 
 // 取得結束評語
