@@ -329,7 +329,6 @@
             color: white;
             font-family: 'BpmfIansui', "SN Pro", sans-serif;
             font-size: 28px;
-            font-weight: 700;
             cursor: pointer;
             transition: transform 0.15s;
             margin-bottom: 16px;
@@ -866,6 +865,20 @@
             .mascot-container { top: -48px; }
             .question-card { margin-top: 40px; padding: 48px 20px 24px; }
         }
+
+        /* === 語言樣式 === */
+        .lang-en .big-btn,
+        .lang-en .stats-tab,
+        .lang-en .screen-title,
+        .lang-en .modal-btn {
+            font-weight: 700;
+        }
+        .lang-zh .big-btn,
+        .lang-zh .stats-tab,
+        .lang-zh .screen-title,
+        .lang-zh .modal-btn {
+            font-weight: 400;
+        }
     </style>
 </head>
 <body>
@@ -884,12 +897,12 @@
             <div class="mascot-container" style="position:relative; top:0; left:0; transform:none; margin-bottom:16px;">
                 <img id="mascotStart" class="mascot-image" src="" alt="貓頭鷹">
             </div>
-            <div class="screen-title" id="homeTitle">🎯 99 乘法大挑戰</div>
-            <div class="screen-subtitle" id="homeSubtitle">30 秒內答對越多越好！</div>
-            <button class="big-btn btn-start" id="btnMultiply" onclick="startGame('multiply')">✕ 乘法遊戲</button>
-            <button class="big-btn btn-start" id="btnChallenge" onclick="startGame('challenge')">✕ 乘法挑戰</button>
-            <button class="big-btn btn-start" id="btnDivide" onclick="startGame('divide')">÷ 除法挑戰</button>
-            <button class="big-btn btn-stats" id="btnViewStats" onclick="showStats()">📊 查看統計</button>
+            <div class="screen-title" data-i18n="title">🎯 99 乘法大挑戰</div>
+            <div class="screen-subtitle" data-i18n="subtitle">30 秒內答對越多越好！</div>
+            <button class="big-btn btn-start" data-i18n="multiplyGame" onclick="startGame('multiply')">✕ 乘法遊戲</button>
+            <button class="big-btn btn-start" data-i18n="multiplyChallenge" onclick="startGame('challenge')">✕ 乘法挑戰</button>
+            <button class="big-btn btn-start" data-i18n="divideChallenge" onclick="startGame('divide')">÷ 除法挑戰</button>
+            <button class="big-btn btn-stats" data-i18n="viewStats" onclick="showStats()">📊 查看統計</button>
         </div>
 
         <!-- ===== 遊戲中畫面 ===== -->
@@ -941,26 +954,26 @@
             <div class="mascot-container" style="position:relative; top:0; left:0; transform:none; margin-bottom:16px;">
                 <img id="mascotEnd" class="mascot-image" src="" alt="貓頭鷹">
             </div>
-            <div class="screen-title" id="endTitle">🎉 遊戲結束！</div>
+            <div class="screen-title" data-i18n="gameOver">🎉 遊戲結束！</div>
             <div class="final-score" id="finalScore">0</div>
             <div class="screen-subtitle" id="endMessage">太棒了！</div>
-            <button class="big-btn btn-start" id="btnPlayAgain" onclick="startGame(gameMode)">🔄 再玩一次</button>
-            <button class="big-btn btn-stats" id="btnViewStats2" onclick="showStats()">📊 查看統計</button>
+            <button class="big-btn btn-start" data-i18n="playAgain" onclick="startGame(gameMode)">🔄 再玩一次</button>
+            <button class="big-btn btn-stats" data-i18n="viewStats" onclick="showStats()">📊 查看統計</button>
         </div>
 
         <!-- ===== 統計頁面 ===== -->
         <div class="stats-page hidden" id="statsScreen">
             <div class="stats-header">
-                <div class="screen-title" id="statsTitle">📊 學習統計</div>
+                <div class="screen-title" data-i18n="statsTitle">📊 學習統計</div>
                 <button class="reset-btn-small" onclick="confirmReset()">🗑️</button>
             </div>
             <div class="stats-tabs">
-                <button class="stats-tab active" id="tabRecent" onclick="switchTab('recent')">最近紀錄</button>
-                <button class="stats-tab" id="tabChart" onclick="switchTab('chart')">每日圖表</button>
+                <button class="stats-tab active" id="tabRecent" data-i18n="tabRecent" onclick="switchTab('recent')">最近紀錄</button>
+                <button class="stats-tab" id="tabChart" data-i18n="tabChart" onclick="switchTab('chart')">每日圖表</button>
             </div>
             <div class="stats-box" id="recentBox">
                 <div class="stats-scroll" id="recentList">
-                    <div class="no-data" id="noRecentData">還沒有遊戲紀錄</div>
+                    <div class="no-data" data-i18n="noRecord" id="noRecentData">還沒有遊戲紀錄</div>
                 </div>
             </div>
             <div class="hidden" id="chartContainer">
@@ -972,9 +985,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="no-data" id="noScoreData">還沒有遊戲紀錄</div>
+                <div class="no-data" data-i18n="noRecord" id="noScoreData">還沒有遊戲紀錄</div>
             </div>
-            <button class="big-btn btn-back" id="btnBack" onclick="hideStats()" style="margin-top: 20px;">← 返回</button>
+            <button class="big-btn btn-back" data-i18n="back" onclick="hideStats()" style="margin-top: 20px;">← 返回</button>
         </div>
 
         <!-- ===== 設定頁面 ===== -->
@@ -982,16 +995,15 @@
             <div class="mascot-container" style="position:relative; top:0; left:0; transform:none; margin-bottom:16px;">
                 <img class="mascot-image" src="images/owl_delighted.webp" alt="貓頭鷹">
             </div>
-            <div class="screen-title" id="settingsTitle">要練習什麼數字呢？</div>
-            <!---div class="screen-subtitle" id="settingsSubtitle">選擇要練習的乘法表</div-->
+            <div class="screen-title" data-i18n="settingsTitle">要練習什麼數字呢？</div>
             <div class="settings-grid" id="settingsGrid">
                 <!-- 2-9 的乘法表 toggle -->
             </div>
             <div class="settings-actions">
-                <button id="btnDeselectAll" onclick="selectAllMults(false)">取消全選</button>
-                <button id="btnSelectAll" onclick="selectAllMults(true)">全選</button>
+                <button data-i18n="settingsDeselectAll" onclick="selectAllMults(false)">取消全選</button>
+                <button data-i18n="settingsSelectAll" onclick="selectAllMults(true)">全選</button>
             </div>
-            <button class="big-btn btn-settings" id="btnSettingsSave" onclick="saveSettings()" style="margin-top: 12px;">✓ 儲存</button>
+            <button class="big-btn btn-settings" data-i18n="settingsSave" onclick="saveSettings()" style="margin-top: 12px;">✓ 儲存</button>
         </div>
     </div>
 
@@ -1001,8 +1013,8 @@
             <img class="modal-owl" id="modalOwl" src="images/owl_surprised.webp" alt="貓頭鷹">
             <div class="modal-text" id="modalText">刪除嗎？</div>
             <div class="modal-buttons">
-                <button class="modal-btn modal-cancel" id="btnCancel" onclick="closeModal()">取消</button>
-                <button class="modal-btn modal-confirm" id="modalConfirm">確定</button>
+                <button class="modal-btn modal-cancel" data-i18n="cancel" onclick="closeModal()">取消</button>
+                <button class="modal-btn modal-confirm" data-i18n="confirm" id="modalConfirm">確定</button>
             </div>
         </div>
     </div>
@@ -1141,44 +1153,6 @@
             setAllMascots(mascotImages[0]);
         }
         initMascot();
-
-        // 初始化文字（使用 strings.js）
-        function initStrings() {
-            // 語言按鈕
-            document.getElementById('langBtn').textContent = currentLang === 'zh' ? 'EN' : '中';
-
-            // 首頁
-            document.getElementById('homeTitle').textContent = t('title');
-            document.getElementById('homeSubtitle').textContent = t('subtitle');
-            document.getElementById('btnMultiply').textContent = t('multiplyGame');
-            document.getElementById('btnChallenge').textContent = t('multiplyChallenge');
-            document.getElementById('btnDivide').textContent = t('divideChallenge');
-            document.getElementById('btnViewStats').textContent = t('viewStats');
-
-            // 結束畫面
-            document.getElementById('endTitle').textContent = t('gameOver');
-            document.getElementById('btnPlayAgain').textContent = t('playAgain');
-            document.getElementById('btnViewStats2').textContent = t('viewStats');
-
-            // 統計頁面
-            document.getElementById('statsTitle').textContent = t('statsTitle');
-            document.getElementById('tabRecent').textContent = t('tabRecent');
-            document.getElementById('tabChart').textContent = t('tabChart');
-            document.getElementById('noRecentData').textContent = t('noRecord');
-            document.getElementById('noScoreData').textContent = t('noRecord');
-            document.getElementById('btnBack').textContent = t('back');
-
-            // 設定頁面
-            document.getElementById('settingsTitle').textContent = t('settingsTitle');
-            document.getElementById('btnSettingsSave').textContent = t('settingsSave');
-            document.getElementById('btnSelectAll').textContent = t('settingsSelectAll');
-            document.getElementById('btnDeselectAll').textContent = t('settingsDeselectAll');
-
-            // 確認彈窗
-            document.getElementById('btnCancel').textContent = t('cancel');
-            document.getElementById('modalConfirm').textContent = t('confirm');
-        }
-        initStrings();
 
         // 切換語言
         function toggleLang() {

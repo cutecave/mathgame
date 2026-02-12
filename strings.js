@@ -120,8 +120,25 @@ function t(key) {
 function setLang(lang) {
     currentLang = lang;
     localStorage.setItem(LANG_KEY, lang);
-    if (typeof initStrings === 'function') initStrings();
+    document.body.className = 'lang-' + lang;
+    updateAllI18n();
 }
+
+// 自動更新所有 data-i18n 元素
+function updateAllI18n() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        el.textContent = t(el.dataset.i18n);
+    });
+    // 更新語言按鈕
+    const langBtn = document.getElementById('langBtn');
+    if (langBtn) langBtn.textContent = currentLang === 'zh' ? 'EN' : '中';
+}
+
+// 頁面載入時初始化
+document.addEventListener('DOMContentLoaded', () => {
+    document.body.className = 'lang-' + currentLang;
+    updateAllI18n();
+});
 
 // 取得結束評語
 function getEndMessage(score) {
